@@ -1,0 +1,8 @@
+<form action="/upload" method="POST" enctype="multipart/form-data" >
+    <span><input type="file" name="file" accept="image/*" multiple></span>
+    <span><input type="submit" value="Submit" id="label" ></span>
+
+
+{% for pic in pics %}
+<img  src="data:;base64,{{pic.rendered_data}}" style="width: 80px; height: 80px;"> 
+{% endfor %}
