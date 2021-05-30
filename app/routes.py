@@ -37,7 +37,7 @@ def add_product():
                            inventory=form.inventory.data)
         db.session.add(product)
         db.session.commit()
-        return redirect(url_for('add_product'))
+        return redirect(url_for('products'))
     return render_template('add_product.html', form=form)
 
 
@@ -55,5 +55,6 @@ def delete(id):
         if form == 'Delete':
             db.session.delete(del_pic)
             db.session.commit()
+            flash('The product is live now!')
             return redirect(url_for('manage_products'))
     return redirect(url_for('manage_products'))

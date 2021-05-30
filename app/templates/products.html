@@ -2,10 +2,19 @@
 {% block header %}
 <h1>{% block title %}Products{% endblock %}</h1>
 {% endblock %}
-{% block content %}
-
-{% for p in pic %}
-<img src="data:;base64,{{p.rendered_data}}" style="width: 180px; height:200px;"> 
-{% endfor %}
-
-{% endblock %}
+<div class="container">
+    {% block content %}
+    {% for p in pic %}
+<div class="card">
+    <img class="img-card" src="data:;base64,{{p.rendered_data}}" style="width: 180px; height: 180px;">
+    <div class="card-body">
+      <h5 class="card-title">{{ p.title }}</h5>
+        <p><b><del>Price:${{p.price}}</del></p></b>
+        <p style="color: red;"><b>Discunted: ${{p.discunted}}</p></b>
+      <a href="#" class="btn btn-primary">Add To Cart</a>
+      <a href="#" class="btn btn-primary">Details</a>
+    </div>
+  </div>
+  {% endfor %}
+  {% endblock %}
+</div>
