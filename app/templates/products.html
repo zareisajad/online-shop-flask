@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block header %}
+<h1>{% block title %}Products{% endblock %}</h1>
+{% endblock %}
+{% block content %}
+
+{% for p in pic %}
+<img src="data:;base64,{{p.rendered_data}}" style="width: 180px; height:200px;"> 
+{% endfor %}
+
+{% endblock %}

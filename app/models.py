@@ -5,3 +5,8 @@ class Products(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.LargeBinary)
     rendered_data = db.Column(db.Text)
+    title = db.Column(db.String)
+    price = db.Column(db.Integer)
+    discunted = db.Column(db.Integer)
+    inventory = db.Column(db.Integer)
+    sold = db.Column(db.Integer)

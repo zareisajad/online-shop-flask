@@ -1,0 +1,20 @@
+<!doctype html>
+<title>{% block title %}{% endblock %} - Shop</title>
+<nav>
+    <span><b>Flask Shop | </b> </span>
+    <a href="{{ url_for('add_product') }}">Add New Product</a> |
+    <a href="{{ url_for('products') }}">Products</a> |
+    <a href="{{ url_for('manage_products') }}">Manage</a> |
+
+
+</nav>
+<hr>
+<section class="content">
+    <header>
+        {% block header %}{% endblock %}
+    </header>
+  {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</section>

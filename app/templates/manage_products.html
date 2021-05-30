@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block header %}
+<h1>{% block title %}Products{% endblock %}</h1>
+<style>
+
+    .button {
+      background-color: #990a0a;
+      border: none;
+      color: white;
+      padding: 11px 22px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 0.3rem;
+    }
+    
+    table {
+        width:100%;
+    }
+    h3 {
+        color: crimson;
+        text-align: center;
+        }
+    th, td {
+        padding: 15px;
+        text-align: center;
+        }
+    #t01 tr:nth-child(even) {
+        background-color: #eee;
+        }
+    #t01 tr:nth-child(odd) {
+        background-color:#eee;
+        }
+    #t01 th {
+        background-color:#353535;
+        color: white;
+        }
+    #upload {
+        width: auto;
+        background-color: #353535;
+        color: white;
+        padding: 0.5rem;
+        font-family: sans-serif;
+        border-radius: 0.3rem;
+        cursor: pointer;
+        margin-top: 1rem;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+<table id="t01">
+    <tr>
+        <th>sold</th>
+        <th>inventory</th>
+        <th>discunted price</th>
+        <th>price</th> 
+        <th>title</th>
+        <th>photo</th>
+        <th></th>
+    </tr>
+    {% if products %}
+    {% for pic in products %}   
+    <tr>
+        {% if pic.sold is none %}
+        <td>0</td>
+        {% else %}
+        <td>{{ pic.sold }}</td>
+        {% endif %}  
+      <td>{{ pic.inventory }}</td>
+      <td>{{pic.price}}</td>
+      <td>{{ pic.discunted}}</td>
+      <td>{{pic.title}}</td>
+      <td>
+        <img class="card-img-top" src="data:;base64,{{pic.rendered_data}}" 
+            style="width: 80px; height: 80px;"> 
+      </td>
+      <td>
+        <form action="{{url_for('delete', id=pic.id)}}" method="POST">
+        <input type="submit" value="Delete" name="delete"  class="button">
+      </td>
+    {% endfor %}
+    {% else %}
+    </tr>
+</table>
+<h3>There is no product!</h3>
+{% endif %}
+{% endblock %}

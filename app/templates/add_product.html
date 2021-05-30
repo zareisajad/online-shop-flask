@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block header %}
+  <h1>{% block title %}Add product{% endblock %}</h1>
+{% endblock %}
+{% block content %}
+  <form method="POST" enctype="multipart/form-data" accept="image/*">
+    {{ form.hidden_tag() }}
+    <p>
+      {{ form.photo.label }}<br>
+      {{ form.photo(size=32) }}<br>
+    </p>
+    <p>
+      {{ form.title.label }}<br>
+      {{ form.title(size=32) }}<br>
+    </p>
+    <p>
+      {{ form.discunted.label }}<br>
+      {{ form.discunted(size=10) }}<br>
+    </p>
+    <p>
+      {{ form.price.label }}<br>
+      {{ form.price(size=10) }}<br>
+    </p>
+    <p>
+      {{ form.inventory.label }}<br>
+      {{ form.inventory(size=10) }}<br>
+    </p>
+    {{ form.submit() }}
+{% endblock %}
