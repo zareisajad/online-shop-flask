@@ -1,48 +1,14 @@
 * {box-sizing: border-box;}
-.button {
-    background-color: #990a0a;
-    border: none;
-    color: white;
-    padding: 11px 22px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 0.3rem;
-}
-    
-table {
-    width:100%;
-}
-h3 {
-    color: crimson;
-    text-align: center;
-    }
+table {width: 100%;}
 th, td {
-    padding: 15px;
+    padding: 10px;
     text-align: center;
-    }
-#t01 tr:nth-child(even) {
-    background-color: #eee;
-    }
-#t01 tr:nth-child(odd) {
-    background-color:#eee;
-    }
+    border: 1px solid black;
+    border-collapse: collapse;
+}
 #t01 th {
-    background-color:#383838;
-    color: rgb(180, 180, 180);
-    }
-#upload {
-    width: auto;
-    background-color: #353535;
-    color: white;
-    padding: 0.5rem;
-    font-family: sans-serif;
-    border-radius: 0.3rem;
-    cursor: pointer;
-    margin-top: 1rem;
+    background-color:#080808c5;
+    color: rgb(255, 255, 255);
 }
 .card {
     border: black;
@@ -59,12 +25,8 @@ th, td {
     overflow:hidden;
     text-overflow: ellipsis;
     word-break: break-all;
-
 }
-.img-card {
-    border-radius: 90px;
-}
-
+.img-card {border-radius: 90px;}
 @media screen and (max-width: 600px) {
     .card {
       width: 90%;
@@ -72,7 +34,7 @@ th, td {
       display: block;
       margin-bottom: 20px;
     }
-  }
+}
 .add-form {
     background-color: rgb(105, 105, 105);
     padding: 15px;
@@ -94,11 +56,11 @@ th, td {
     list-style:none;
 }
 .total_amount {
-    background-color: #007BFF;
-    color: azure;
-    width: 25%;
+    background-color: #383838;
+    color: rgb(255, 255, 255);
+    width: 15%;
 }
 .total_amount_text {
-    font-size: 18px;
+    font-size: 17px;
     padding: 5px;
 }
