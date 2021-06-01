@@ -12,7 +12,7 @@
         <p><b><del>Price:${{p.price}}</del></p></b>
         <p style="color: red;"><b>Discunted: ${{p.discunted}}</p></b>
       <a href="#" class="btn btn-primary">Add To Cart</a>
-      <a href="#" class="btn btn-primary">Details</a>
+      <a href="{{url_for('product_detail', id=p.id)}}" class="btn btn-primary">Details</a>
     </div>
   </div>
   {% endfor %}

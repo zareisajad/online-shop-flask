@@ -10,3 +10,5 @@ class Products(db.Model):
     discunted = db.Column(db.Integer) # TODO currect 'discounted' :|
     inventory = db.Column(db.Integer)
     sold = db.Column(db.Integer)
+    data_gallery = db.Column(db.LargeBinary)
+    rendered_gallery = db.Column(db.Text)

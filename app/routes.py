@@ -3,7 +3,6 @@ from app import app, db
 from flask import render_template, flash, redirect, url_for, request
 from app.models import Products
 from app.forms import AddProductForm
-from werkzeug.utils import secure_filename
 
 
 def render_picture(data):
@@ -21,20 +20,21 @@ def products():
     return render_template('products.html', pic=pic)
 
 
-# TODO : Add new data and render seperate for gallery pics.
-# Also a new file field in forms. next try to handle it here
 @app.route('/add', methods=['POST','GET'])
 def add_product():
     form = AddProductForm()
     if form.validate_on_submit():
-        f = form.photo.data
-        filename = secure_filename(f.filename) # check if can need for secure while read()
+        f = form.photo.data 
         data = f.read()
         render_file = render_picture(data)
+        g = form.photos.data # list
+        for i in g:
+            data_gallery = i.read()
+            rendered_g = render_picture(data_gallery)
         product = Products(data=data, rendered_data=render_file,
-                           title=form.title.data, price=form.price.data,
-                           discunted=form.discunted.data, 
-                           inventory=form.inventory.data)
+                        title=form.title.data, price=form.price.data,
+                        discunted=form.discunted.data, inventory=form.inventory.data,
+                        data_gallery=data_gallery, rendered_gallery=rendered_g)
         db.session.add(product)
         db.session.commit()
         return redirect(url_for('products'))
@@ -47,14 +47,15 @@ def manage_products():
     return render_template('manage_products.html', products=products)
 
 
-@app.route('/<int:id>/delete', methods=['GET', 'POST'])
+@app.route('/del/<int:id>', methods=['GET', 'POST'])
 def delete(id):
     del_pic = Products.query.get(id)
-    if request.method == 'POST':
-        form = request.form['delete']
-        if form == 'Delete':
-            db.session.delete(del_pic)
-            db.session.commit()
-            flash('The product is live now!')
-            return redirect(url_for('manage_products'))
+    db.session.delete(del_pic)
+    db.session.commit()
     return redirect(url_for('manage_products'))
+
+
+@app.route('/p/<int:id>',methods=['GET', 'POST'])
+def product_detail(id):
+    product = Products.query.filter_by(id=id).first()
+    return render_template('product_detail.html', product=product)

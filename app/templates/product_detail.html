@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block header %}
+  <h1>{% block title %}{% endblock %}</h1>
+{% endblock %}
+{% block content %}
+
+<img src="data:;base64,{{product.rendered_data}}"
+style="width: 180px; height: 180px;">
+<p> <b>Name :</b> {{product.title}}</p>
+<p> <b>Price :</b> {{product.price}}</p>
+<p> <b>Discunted :</b> {{product.discunted}}</p>
+<p> <b>Inventory :</b> {{product.inventory}}</p>
+{% if product.sold is none %}
+<p> <b>Sold Number :</b> 0</p>
+{% else %}
+<p> <b>Sold Number :</b> {{product.sold}}</p>
+{% endif %} 
+<a href="#" class="btn btn-primary">Add To Cart</a>
+
+
+
+<img src="data:;base64,{{product.rendered_gallery}}" style="width: 180px; height: 180px;">
+{% endblock %}

@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block header %}
-<h1>{% block title %}Products{% endblock %}</h1>
+<h1>{% block title %}Manage Products{% endblock %}</h1>
 {% endblock %}
 {% block content %}
+
 
 <table id="t01">
     <tr>
@@ -31,8 +32,7 @@
             style="width: 80px; height: 80px;"> 
       </td>
       <td>
-        <form action="{{url_for('delete', id=pic.id)}}" method="POST">
-        <input type="submit" value="Delete" name="delete"  class="button">
+        <a name='delete' href="{{url_for('delete', id=pic.id)}}" class="btn btn-primary" >Delete</a>
       </td>
     {% endfor %}
     {% else %}

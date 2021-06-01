@@ -3,27 +3,40 @@
   <h1>{% block title %}Add product{% endblock %}</h1>
 {% endblock %}
 {% block content %}
-  <form method="POST" enctype="multipart/form-data" accept="image/*">
-    {{ form.hidden_tag() }}
-    <p>
-      {{ form.photo.label }}<br>
-      {{ form.photo(size=32) }}<br>
-    </p>
-    <p>
-      {{ form.title.label }}<br>
-      {{ form.title(size=32) }}<br>
-    </p>
-    <p>
-      {{ form.discunted.label }}<br>
-      {{ form.discunted(size=10) }}<br>
-    </p>
-    <p>
-      {{ form.price.label }}<br>
-      {{ form.price(size=10) }}<br>
-    </p>
-    <p>
-      {{ form.inventory.label }}<br>
-      {{ form.inventory(size=10) }}<br>
-    </p>
-    {{ form.submit() }}
+<div class="row align-items-center justify-content-center">
+  <div class="col-md-4">
+      <div class="add-form">
+      <form method="POST" enctype="multipart/form-data" accept="image/*" multiple>
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+          <p>
+            {{ form.photo.label }}<br>
+            {{ form.photo(class_='add-form-fields')}}<br>
+          </p>
+          <p>
+            {{ form.title.label }}<br>
+            {{ form.title(class_='add-form-fields') }}<br>
+          </p>
+          <p>
+            {{ form.price.label }}<br>
+            {{ form.price(class_='add-form-fields')}}<br>
+          </p>
+          <p>
+            {{ form.discunted.label }}<br>
+            {{ form.discunted(class_='add-form-fields')}}<br>
+          </p>
+          <p>
+            {{ form.inventory.label }}<br>
+            {{ form.inventory(class_='add-form-fields') }}<br>
+          </p>
+          <p>
+            {{ form.photos.label }}<br>
+            {{ form.photos(class_='add-form-fields')}}<br>
+          </p>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
