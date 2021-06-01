@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block header %}
+<h1>{% block title %}Cart{% endblock %}</h1>
+{% endblock %}
+{% block content %}
+
+
+<table id="t01">
+  <tr>      
+    <th>Final Amount</th>
+    <th>Number</th>
+    <th>price</th>
+    <th>title</th>
+    <th>photo</th>
+    <th></th>
+  </tr>
+  {% set total = [] %}
+  {% if c %}
+  {% for p in c %}   
+  <tr>
+    <td>
+      {% if not p.discunted %}
+      {% set amount =  p.number * p.price %}
+      {% else %}
+      {% set amount =  p.number * p.discunted %}      
+      {% endif %}  
+      {{ amount }}
+    </td>
+    <td>
+      <a href="{{url_for('reduce_num', id=p.id)}}" class="btn btn-primary" >-</a>
+      {{ p.number }}
+      <a href="{{url_for('add_num', id=p.id)}}" class="btn btn-primary" >+</a>
+    </td>
+    {% if not p.discunted %}
+    <td>{{p.price}}</td>
+    {% else %}
+    <td>{{ p.discunted}}</td>
+    {% endif %}  
+    <td>{{p.title}}</td>
+    <td>
+      <img class="card-img-top" src="data:;base64,{{p.rendered_data}}" 
+      style="width: 80px; height: 80px;"> 
+    </td>
+    <td>
+      <a name='delete' href="{{url_for('delete_cart', id=p.id)}}" class="btn btn-primary" >Delete</a>
+    </td>
+    {% set _ = total.append(amount) %}
+    {% endfor %}
+    
+  </tr>
+</table>
+<div class="total_amount">
+<p class="total_amount_text">
+  <b>Total Amount : {{ total | sum()  }}</b></p>
+</div>
+{% else %}
+<h3>There is no product!</h3>
+
+{% endif %}
+{% endblock %}
+  
