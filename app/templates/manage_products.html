@@ -3,9 +3,7 @@
 <h1>{% block title %}Manage Products{% endblock %}</h1>
 {% endblock %}
 {% block content %}
-
-
-<table id="t01">
+<table class="table table-bordered">
     <tr>
         <th>sold</th>
         <th>inventory</th>
@@ -18,14 +16,10 @@
     {% if products %}
     {% for pic in products %}   
     <tr>
-        {% if pic.sold is none %}
-        <td>0</td>
-        {% else %}
-        <td>{{ pic.sold }}</td>
-        {% endif %}  
+      <td>{{ pic.sold }}</td>
       <td>{{ pic.inventory }}</td>
-      <td>{{pic.price}}</td>
       <td>{{ pic.discunted}}</td>
+      <td>{{pic.price}}</td>
       <td>{{pic.title}}</td>
       <td>
         <img class="card-img-top" src="data:;base64,{{pic.rendered_data}}" 
