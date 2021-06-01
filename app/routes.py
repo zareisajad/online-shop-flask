@@ -1,7 +1,7 @@
 import base64
 from app import app, db 
 from flask import render_template, flash, redirect, url_for, request
-from app.models import Products
+from app.models import Products, Cart
 from app.forms import AddProductForm
 
 
@@ -12,10 +12,6 @@ def render_picture(data):
 
 @app.route('/')
 def products():
-    """
-    Here we display all the products with thumbnail,
-    title, price and add to cart button
-    """
     pic = Products.query.all()
     return render_template('products.html', pic=pic)
 
@@ -34,9 +30,10 @@ def add_product():
         product = Products(data=data, rendered_data=render_file,
                         title=form.title.data, price=form.price.data,
                         discunted=form.discunted.data, inventory=form.inventory.data,
-                        data_gallery=data_gallery, rendered_gallery=rendered_g)
+                        sold = 0,data_gallery=data_gallery, rendered_gallery=rendered_g)
         db.session.add(product)
         db.session.commit()
+        flash('Your product is live now!')
         return redirect(url_for('products'))
     return render_template('add_product.html', form=form)
 
@@ -49,8 +46,8 @@ def manage_products():
 
 @app.route('/del/<int:id>', methods=['GET', 'POST'])
 def delete(id):
-    del_pic = Products.query.get(id)
-    db.session.delete(del_pic)
+    del_product = Products.query.get(id)
+    db.session.delete(del_product)
     db.session.commit()
     return redirect(url_for('manage_products'))
 
@@ -59,3 +56,48 @@ def delete(id):
 def product_detail(id):
     product = Products.query.filter_by(id=id).first()
     return render_template('product_detail.html', product=product)
+
+
+@app.route('/cart/<int:id>', methods=['POST','GET'])
+def cart(id):
+    c = Cart.query.filter_by(id=id).first()
+    if not c:
+        p = Products.query.filter_by(id=id).first()
+        cart = Cart(data=p.data, rendered_data=p.rendered_data,title=p.title,
+                    price=p.price,discunted=p.discunted, number=1)
+        db.session.add(cart)
+        db.session.commit()
+        flash('Added to your cart!')
+        return redirect(url_for('products'))
+    flash('This item is already in your cart!')
+    return redirect(url_for('products'))
+
+
+@app.route('/c/add/<int:id>', methods=['POST','GET'])
+def add_num(id):
+    n = Cart.query.filter_by(id=id).first()
+    n.number += 1
+    db.session.commit()
+    return redirect(url_for('show_cart'))
+
+
+@app.route('/c/reduce/<int:id>', methods=['POST','GET'])
+def reduce_num(id):
+    n = Cart.query.filter_by(id=id).first()
+    n.number -= 1
+    db.session.commit()
+    return redirect(url_for('show_cart'))
+
+
+@app.route('/cart', methods=['POST','GET'])
+def show_cart():
+    c = Cart.query.all()
+    return render_template('cart.html', c=c)
+
+
+@app.route('/del/cart/<int:id>', methods=['GET', 'POST'])
+def delete_cart(id):
+    del_cart = Cart.query.get(id)
+    db.session.delete(del_cart)
+    db.session.commit()
+    return redirect(url_for('show_cart'))
