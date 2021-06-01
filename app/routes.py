@@ -47,7 +47,10 @@ def manage_products():
 @app.route('/del/<int:id>', methods=['GET', 'POST'])
 def delete(id):
     del_product = Products.query.get(id)
+    c = Cart.query.get(id)
     db.session.delete(del_product)
+    db.session.commit()
+    db.session.delete(c)
     db.session.commit()
     return redirect(url_for('manage_products'))
 
