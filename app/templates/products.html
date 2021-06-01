@@ -9,10 +9,15 @@
     <img class="img-card" src="data:;base64,{{p.rendered_data}}" style="width: 180px; height: 180px;">
     <div class="card-body">
       <h5 class="card-title">{{ p.title }}</h5>
+      {% if not p.discunted %}
+      <p><b>Discunted: -------- </p></b>
+      <p style="color: red;"><b>Price: ${{p.price}}</p></b>
+      {% else %}
         <p><b><del>Price:${{p.price}}</del></p></b>
         <p style="color: red;"><b>Discunted: ${{p.discunted}}</p></b>
-      <a href="#" class="btn btn-primary">Add To Cart</a>
-      <a href="{{url_for('product_detail', id=p.id)}}" class="btn btn-primary">Details</a>
+        {% endif %}
+        <a href="{{url_for('cart', id=p.id)}}" class="btn btn-primary">Add To Cart</a>
+        <a href="{{url_for('product_detail', id=p.id)}}" class="btn btn-primary">Details</a>
     </div>
   </div>
   {% endfor %}
