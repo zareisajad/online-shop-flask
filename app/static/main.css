@@ -31,8 +31,8 @@ th, td {
     background-color:#eee;
     }
 #t01 th {
-    background-color:#353535;
-    color: white;
+    background-color:#383838;
+    color: rgb(180, 180, 180);
     }
 #upload {
     width: auto;
@@ -92,4 +92,13 @@ th, td {
 	box-shadow: 0 0 5px #6ab7e0;
 	border:1px solid #66a3c4;
     list-style:none;
+}
+.total_amount {
+    background-color: #007BFF;
+    color: azure;
+    width: 25%;
+}
+.total_amount_text {
+    font-size: 18px;
+    padding: 5px;
 }
