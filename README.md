@@ -11,5 +11,5 @@ in cart page user can add or reduce number of a product or remove it.
 ## ToDo:
 - [ ] completing README
 - [ ] fix gallery issue
-- [ ] there is an [class 'flask_sqlalchemy.basequery' is not mapped] error. fix it
+- [x] there is an [class 'flask_sqlalchemy.basequery' is not mapped] error. fix it
 - [ ] product detail page - front design
