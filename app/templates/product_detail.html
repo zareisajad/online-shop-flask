@@ -1,23 +1,43 @@
 {% extends 'base.html' %}
-{% block header %}
-  <h1>{% block title %}{% endblock %}</h1>
-{% endblock %}
+{% block header %}Product Details{% endblock %}
 {% block content %}
-
-<img src="data:;base64,{{product.rendered_data}}"
-style="width: 180px; height: 180px;">
-<p> <b>Name :</b> {{product.title}}</p>
-<p> <b>Price :</b> {{product.price}}</p>
-<p> <b>Discunted :</b> {{product.discunted}}</p>
-<p> <b>Inventory :</b> {{product.inventory}}</p>
-{% if product.sold is none %}
-<p> <b>Sold Number :</b> 0</p>
-{% else %}
-<p> <b>Sold Number :</b> {{product.sold}}</p>
-{% endif %} 
-<a href="#" class="btn btn-primary">Add To Cart</a>
-
-
-
-<img src="data:;base64,{{product.rendered_gallery}}" style="width: 180px; height: 180px;">
-{% endblock %}
+<body>
+  <main class="container">
+    <!-- Left Column / Headphones Image -->
+    <div class="left-column">
+      <img src="{{product.photo}}" class="img-detail" 
+      style="width:500px;height:500px;">
+    </div>
+    <!-- Right Column -->
+    <div class="right-column">
+      <!-- Product Description -->
+      <div class="product-description">
+        <h1>{{product.title}}</h1>
+        <p> <b>Inventory :</b> {{product.inventory}}</p>
+        {% if product.sold is none %}
+        <p> <b>Sold Number :</b> 0</p>
+        {% else %}
+        <p> <b>Sold Number :</b> {{product.sold}}</p>
+        {% endif %} 
+      </div>
+      <!-- Product Pricing -->
+      <div class="product-price">
+        <span><b>Price: </b><del>${{product.price}}</del></span>
+        <span><b>Discounted: ${{product.discounted}}</b></span>
+        <a href="{{url_for('cart', id=product.id)}}"
+          class="btn btn-primary">Add To Cart</a>
+      </div>
+      <hr>
+      <div>
+      {% for i in gallery %}
+      {% if i.p_id == product.id %}
+      <img src="{{i.pics}}" 
+      style="width:130px;height:130px;;margin:5px">
+      {% endif %}
+      {% endfor %}
+    </div>
+    </div>
+  </main>
+  </html>    
+  {% endblock %}
+</body>
