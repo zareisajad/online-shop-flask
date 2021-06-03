@@ -20,10 +20,6 @@ def add_product():
     if form.validate_on_submit():
         uploaded_file = form.photo.data
         filename = secure_filename(uploaded_file.filename)
-        #file_ext = os.path.splitext(filename)[1]
-        #if file_ext not in app.config['UPLOAD_EXTENSIONS']:
-          #  flash('Only images allowed. [jpg , png ]')
-          #  return redirect(url_for('products'))
         uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'],filename))
         url = (os.path.join('static/images',filename))
         p = Products(title=form.title.data, price=form.price.data,
@@ -31,14 +27,9 @@ def add_product():
                     inventory=form.inventory.data, photo=url)
         db.session.add(p)
         db.session.commit()
-        # gallery
         images = form.photos.data
         for img in images:
             filename = secure_filename(img.filename)
-           # file_ext = os.path.splitext(filename)[1]
-          #  if file_ext not in app.config['UPLOAD_EXTENSIONS']:
-             #   flash('Only images allowed. [jpg , png ]')
-             #   return redirect(url_for('products'))
             img.save(os.path.join(app.config['UPLOAD_GALLERY'],filename))
             url = (os.path.join('static/gallery', filename))
             files = Gallery(pics=url, p_id=p.id)
@@ -65,19 +56,15 @@ def delete(id):
             name = i.pics.split('/')[2]
             db.session.delete(i)
             os.remove(app.config['UPLOAD_GALLERY']+'/'+name)
-
     del_product = Products.query.get(id)
     db.session.delete(del_product)
     db.session.commit()
-
     name = del_product.photo.split('/')[2]
     os.remove(app.config['UPLOAD_PATH']+'/'+name)
-
     c = Cart.query.get(id)
     if c:
         db.session.delete(c)
         db.session.commit()
-    
     return redirect(url_for('manage_products'))
 
 
@@ -105,7 +92,6 @@ def cart(id):
         flash('This item is already in your cart!')
         return redirect(url_for('products'))
     return redirect(url_for('products'))
-
 
 
 @app.route('/c/add/<int:id>', methods=['POST','GET'])
