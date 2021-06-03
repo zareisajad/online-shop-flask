@@ -3,22 +3,25 @@ from app import db
 
 class Products(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.LargeBinary)
-    rendered_data = db.Column(db.Text)
+    photo = db.Column(db.String(200))
     title = db.Column(db.String)
     price = db.Column(db.Integer)
-    discunted = db.Column(db.Integer) # TODO currect 'discounted' :|
+    discounted = db.Column(db.Integer)
     inventory = db.Column(db.Integer)
     sold = db.Column(db.Integer)
-    data_gallery = db.Column(db.LargeBinary)
-    rendered_gallery = db.Column(db.Text)
+    gallery = db.relationship('Gallery', backref='gallery', lazy='dynamic')
+
+
+class Gallery(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    pics = db.Column(db.String(264))
+    p_id = db.Column(db.Integer, db.ForeignKey('products.id'))
 
 
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.LargeBinary)
-    rendered_data = db.Column(db.Text)
+    photo = db.Column(db.String(200))
     title = db.Column(db.String)
     price = db.Column(db.Integer)
-    discunted = db.Column(db.Integer)
+    discounted = db.Column(db.Integer)
     number = db.Column(db.Integer)
