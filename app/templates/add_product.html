@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
-{% block header %}
-  <h1>{% block title %}Add product{% endblock %}</h1>
-{% endblock %}
+{% block header %}Add New Product{% endblock %}
 {% block content %}
 <div class="row align-items-center justify-content-center">
   <div class="col-md-4">
@@ -22,8 +20,8 @@
             {{ form.price(class_='add-form-fields')}}<br>
           </p>
           <p>
-            {{ form.discunted.label }}<br>
-            {{ form.discunted(class_='add-form-fields')}}<br>
+            {{ form.discounted.label }}<br>
+            {{ form.discounted(class_='add-form-fields')}}<br>
           </p>
           <p>
             {{ form.inventory.label }}<br>
@@ -38,5 +36,5 @@
       </form>
     </div>
   </div>
-</div>
+</div><br>
 {% endblock %}
