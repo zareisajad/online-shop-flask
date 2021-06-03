@@ -1,37 +1,33 @@
 {% extends 'base.html' %}
-{% block header %}
 <h1>{% block title %}Manage Products{% endblock %}</h1>
-{% endblock %}
+{% block header %}Manage Products{% endblock %}
+
 {% block content %}
 <table class="table table-bordered">
     <tr>
         <th>sold</th>
         <th>inventory</th>
-        <th>discunted price</th>
+        <th>discounted price</th>
         <th>price</th> 
         <th>title</th>
         <th>photo</th>
         <th></th>
     </tr>
-    {% if products %}
     {% for pic in products %}   
     <tr>
       <td>{{ pic.sold }}</td>
       <td>{{ pic.inventory }}</td>
-      <td>{{ pic.discunted}}</td>
+      <td>{{ pic.discounted}}</td>
       <td>{{pic.price}}</td>
       <td>{{pic.title}}</td>
       <td>
-        <img class="card-img-top" src="data:;base64,{{pic.rendered_data}}" 
+        <img class="card-img-top" src="{{pic.photo}}" 
             style="width: 80px; height: 80px;"> 
       </td>
       <td>
         <a name='delete' href="{{url_for('delete', id=pic.id)}}" class="btn btn-primary" >Delete</a>
       </td>
     {% endfor %}
-    {% else %}
     </tr>
 </table>
-<h3>There is no product!</h3>
-{% endif %}
 {% endblock %}
