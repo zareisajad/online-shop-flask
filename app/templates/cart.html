@@ -1,10 +1,6 @@
 {% extends 'base.html' %}
-{% block header %}
-<h1>{% block title %}Cart{% endblock %}</h1>
-{% endblock %}
+{% block header %}Cart{% endblock %}
 {% block content %}
-
-
 <table id="t01">
   <tr>      
     <th>Final Amount</th>
@@ -15,14 +11,13 @@
     <th></th>
   </tr>
   {% set total = [] %}
-  {% if c %}
   {% for p in c %}   
   <tr>
     <td>
-      {% if not p.discunted %}
+      {% if not p.discounted %}
       {% set amount =  p.number * p.price %}
       {% else %}
-      {% set amount =  p.number * p.discunted %}      
+      {% set amount =  p.number * p.discounted %}      
       {% endif %}  
       {{ amount }}
     </td>
@@ -31,14 +26,14 @@
       {{ p.number }}
       <a href="{{url_for('add_num', id=p.id)}}" class="btn btn-primary" >+</a>
     </td>
-    {% if not p.discunted %}
+    {% if not p.discounted %}
     <td>{{p.price}}</td>
     {% else %}
-    <td>{{ p.discunted}}</td>
+    <td>{{ p.discounted}}</td>
     {% endif %}  
     <td>{{p.title}}</td>
     <td>
-      <img class="card-img-top" src="data:;base64,{{p.rendered_data}}" 
+      <img class="card-img-top" src="{{p.photo}}" 
       style="width: 80px; height: 80px;"> 
     </td>
     <td>
@@ -46,16 +41,11 @@
     </td>
     {% set _ = total.append(amount) %}
     {% endfor %}
-    
   </tr>
 </table>
 <div class="total_amount">
 <p class="total_amount_text">
   <b>Total Amount : {{ total | sum()  }}</b></p>
 </div>
-{% else %}
-<h3>There is no product!</h3>
-
-{% endif %}
 {% endblock %}
   
