@@ -8,8 +8,10 @@ in cart page user can add or reduce number of a product or remove it.
 - Flask framework
 - Bootstrap
 ## To Use:
-## ToDo:
-- [ ] completing README
-- [ ] fix gallery issue
-- [x] there is an [class 'flask_sqlalchemy.basequery' is not mapped] error. fix it
-- [ ] product detail page - front design
+- install python3, pip3, virtualenv
+- clone the project 
+- create a virtualenv named venv using ``` python -m venv venv ```
+- Connect to virtualenv using ``` source venv/bin/activate ```
+- from the project folder, install packages using ``` pip install -r requirements.txt ```
+- for db migrations use : ``` flask db upgrade ```
+- finally ``` flask run ```
