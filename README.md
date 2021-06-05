@@ -16,5 +16,5 @@ in cart page user can add or reduce number of a product or remove it.
 - create a virtualenv named venv using ``` python -m venv venv ```
 - Connect to virtualenv using ``` source venv/bin/activate ```
 - from the project folder, install packages using ``` pip install -r requirements.txt ```
-- for db migrations use : ``` flask db upgrade ```
+- for database migrations use : ``` flask db upgrade ```
 - finally ``` flask run ```
