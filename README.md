@@ -5,9 +5,10 @@ user also can manage [delete a product or see inventory and sold number] in anot
 in cart page user can add or reduce number of a product or remove it.
 ![Peek 2021-06-03 20-02](https://user-images.githubusercontent.com/71011395/120673396-61d79400-c4a8-11eb-96e2-0f70ae542027.gif)
 ## Used:
-- Python3 
+- Python3
 - Flask framework
 - Bootstrap
+- SQLite database 
 ## To Use:
 - install python3, pip3, virtualenv
 - clone the project 
