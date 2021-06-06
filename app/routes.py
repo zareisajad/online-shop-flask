@@ -76,11 +76,11 @@ def product_detail(id):
         'product_detail.html', product=product, gallery=gallery)
 
 
-@app.route('/cart/<int:id>', methods=['POST','GET'])
-def cart(id):
-    c = Cart.query.filter_by(id=id).first()
+@app.route('/cart/<title>', methods=['POST','GET'])
+def cart(title):
+    c = Cart.query.filter_by(title=title).first()
     if not c:
-        p = Products.query.filter_by(id=id).first()
+        p = Products.query.filter_by(title=title).first()
         cart = Cart(
             photo=p.photo, title=p.title,number=1,
             price=p.price, discounted=p.discounted)
