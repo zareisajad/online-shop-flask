@@ -5,6 +5,7 @@
   <tr>      
     <th>Final Amount</th>
     <th>Number</th>
+    <th>inventory</th>
     <th>price</th>
     <th>title</th>
     <th>photo</th>
@@ -19,17 +20,18 @@
       {% else %}
       {% set amount =  p.number * p.discounted %}      
       {% endif %}  
-      {{ amount }}
+      ${{ amount }}
     </td>
     <td>
       <a href="{{url_for('reduce_num', id=p.id)}}" class="btn btn-primary" >-</a>
       {{ p.number }}
       <a href="{{url_for('add_num', id=p.id)}}" class="btn btn-primary" >+</a>
     </td>
+    <td>{{ p.inventory}}</td>
     {% if not p.discounted %}
-    <td>{{p.price}}</td>
+    <td>${{p.price}}</td>
     {% else %}
-    <td>{{ p.discounted}}</td>
+    <td>${{ p.discounted}}</td>
     {% endif %}  
     <td>{{p.title}}</td>
     <td>
@@ -45,7 +47,7 @@
 </table>
 <div class="total_amount">
 <p class="total_amount_text">
-  <b>Total Amount : {{ total | sum()  }}</b></p>
+  <b>Total Amount : ${{ total | sum()  }}</b></p>
 </div>
 {% endblock %}
   
