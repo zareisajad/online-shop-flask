@@ -82,8 +82,8 @@ def cart(title):
     if not c:
         p = Products.query.filter_by(title=title).first()
         cart = Cart(
-            photo=p.photo, title=p.title,number=1,
-            price=p.price, discounted=p.discounted)
+            photo=p.photo, title=p.title,number=0,
+            price=p.price, discounted=p.discounted, inventory=p.inventory)
         db.session.add(cart)
         db.session.commit()
         flash('Added to your cart!')
@@ -97,16 +97,31 @@ def cart(title):
 @app.route('/c/add/<int:id>', methods=['POST','GET'])
 def add_num(id):
     n = Cart.query.filter_by(id=id).first()
-    n.number += 1
-    db.session.commit()
+    p = Products.query.filter_by(title=n.title).first()
+    if n.inventory == 0:
+        flash('You picked up the last one - there is nothing left')
+        return redirect(url_for('show_cart'))
+    else:
+        n.number += 1
+        n.inventory -= 1
+        p.inventory -= 1
+        p.sold += 1
+        db.session.commit()
     return redirect(url_for('show_cart'))
 
 
 @app.route('/c/reduce/<int:id>', methods=['POST','GET'])
 def reduce_num(id):
     n = Cart.query.filter_by(id=id).first()
-    n.number -= 1
-    db.session.commit()
+    p = Products.query.filter_by(title=n.title).first()
+    if n.number != 0:
+        n.number -= 1
+        n.inventory += 1
+        p.inventory += 1
+        p.sold -= 1
+        db.session.commit()
+    else:
+        return redirect(url_for('show_cart'))
     return redirect(url_for('show_cart'))
 
 
