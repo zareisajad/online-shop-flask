@@ -23,5 +23,6 @@ class Cart(db.Model):
     photo = db.Column(db.String(200))
     title = db.Column(db.String)
     price = db.Column(db.Integer)
+    inventory = db.Column(db.Integer)
     discounted = db.Column(db.Integer)
     number = db.Column(db.Integer)
