@@ -24,7 +24,7 @@
       <div class="product-price">
         <span><b>Price: </b><del>${{product.price}}</del></span>
         <span><b>Discounted: ${{product.discounted}}</b></span>
-        <a href="{{url_for('cart', id=product.title)}}"
+        <a href="{{url_for('cart', title=product.title)}}"
           class="btn btn-primary">Add To Cart</a>
       </div>
       <hr>
