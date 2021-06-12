@@ -54,7 +54,7 @@ def add_category():
     return render_template('add_category.html', form=form)
 
 
-@app.route('/category/<int:id>', methods=['POST','GET'])
+@app.route('/<int:id>', methods=['POST','GET'])
 def category(id):
     pro = Products.query.filter_by(category_id=id).all()
     return render_template('products_category.html', pro=pro)
