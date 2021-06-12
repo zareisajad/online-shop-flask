@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+<h1>{% block title %}Products{% endblock %}</h1>
+{% block header %}Products{% endblock %}
+<div class="container">
+{% block content %}
+{% for p in pro %}
+<div class="card">
+  <img class="img-card" src={{ p.photo }} style="width: 180px; height: 180px;">
+  <div class="card-body">
+    <h5 class="card-title">{{ p.title }}</h5>
+    {% if not p.discounted %}
+    <p><b>Discounted: -------- </p></b>
+    <p style="color: red;"><b>Price: ${{p.price}}</p></b>
+    {% else %}
+    <p><b><del>Price:${{p.price}}</del></p></b>
+    <p style="color: red;"><b>Discounted: ${{p.discounted}}</p></b>
+    {% endif %}
+    <a href="{{url_for('cart', title=p.title)}}" class="btn btn-primary">Add To Cart</a>
+    <a href="{{url_for('product_detail', id=p.id)}}" class="btn btn-primary">Details</a>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
+</div>
