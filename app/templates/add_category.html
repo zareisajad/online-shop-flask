@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block header %}Add New Category{% endblock %}
+{% block content %}
+<div class="row align-items-center justify-content-center">
+  <div class="col-md-4">
+      <div class="add-form">
+      <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+          <p>
+            {{ form.name.label }}<br>
+            {{ form.name(class_='add-form-fields')}}<br>
+          </p>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Category</button>
+      </form>
+    </div>
+  </div>
+</div><br>
+{% endblock %}
