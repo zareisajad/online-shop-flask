@@ -1,30 +1,32 @@
 import os
 from app import app, db 
 from flask import render_template, flash, redirect, url_for
-from app.models import Products, Cart, Gallery
-from app.forms import AddProductForm
+from app.models import Products, Cart, Gallery, Category
+from app.forms import AddProductForm, AddCategoryForm
 from werkzeug.utils import secure_filename
 
 
 @app.route('/')
 def products():
     pic = Products.query.all()
+    category = Category.query.all()
     if not pic:
         flash('There is no products yet. you can add from top menu')
-    return render_template('products.html', pic=pic)
+    return render_template('products.html', pic=pic, category=category)
 
 
 @app.route('/add', methods=['POST','GET'])
 def add_product():
     form = AddProductForm()
     if form.validate_on_submit():
+        c = Category.query.filter_by(name=str(form.category.data)).first()
         uploaded_file = form.photo.data
         filename = secure_filename(uploaded_file.filename)
         uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'],filename))
         url = (os.path.join('static/images',filename))
         p = Products(title=form.title.data, price=form.price.data,
                     discounted=form.discounted.data, sold = 0,
-                    inventory=form.inventory.data, photo=url)
+                    inventory=form.inventory.data, photo=url,category_id=c.id)
         db.session.add(p)
         db.session.commit()
         images = form.photos.data
@@ -38,6 +40,25 @@ def add_product():
         flash('Your product is live now!')
         return redirect(url_for('products'))
     return render_template('add_product.html', form=form)
+
+
+@app.route('/add-category', methods=['POST','GET'])
+def add_category():
+    form = AddCategoryForm()
+    if form.validate_on_submit():
+        category = Category(name=form.name.data)
+        db.session.add(category)
+        db.session.commit()
+        flash('New category added.')
+        return redirect(url_for('add_product'))
+    return render_template('add_category.html', form=form)
+
+
+@app.route('/category/<int:id>', methods=['POST','GET'])
+def category(id):
+    pro = Products.query.filter_by(category_id=id).all()
+    return render_template('products_category.html', pro=pro)
+
 
 
 @app.route('/manage', methods=['POST','GET'])
@@ -72,8 +93,10 @@ def delete(id):
 def product_detail(id):
     product = Products.query.filter_by(id=id).first()
     gallery = Gallery.query.all()
+    category = Category.query.filter_by(id=product.category_id).first()
     return render_template(
-        'product_detail.html', product=product, gallery=gallery)
+        'product_detail.html', product=product,
+         gallery=gallery, category=category)
 
 
 @app.route('/cart/<title>', methods=['POST','GET'])
