@@ -28,6 +28,11 @@
             {{ form.inventory(class_='add-form-fields') }}<br>
           </p>
           <p>
+            {{ form.category.label }} <br>
+            {{ form.category(class_='add-form-fields') }}<br>
+            <a href="{{ url_for('add_category') }}">click here to add new category</a>
+          </p>
+          <p>
             {{ form.photos.label }}<br>
             {{ form.photos(class_='add-form-fields')}}<br>
           </p>
