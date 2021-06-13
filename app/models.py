@@ -9,6 +9,7 @@ class Products(db.Model):
     discounted = db.Column(db.Integer)
     inventory = db.Column(db.Integer)
     sold = db.Column(db.Integer)
+    rate = db.Column(db.Integer)
     gallery = db.relationship('Gallery', backref='gallery', lazy='dynamic')
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('Category', backref='category')
