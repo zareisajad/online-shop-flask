@@ -18,11 +18,19 @@
     <a href="{{url_for('cart', title=p.title)}}" class="btn btn-primary">Add To Cart</a>
     <a href="{{url_for('product_detail', id=p.id)}}" class="btn btn-primary">Details</a>
   </div>
+  <a href="{{ url_for('reduce_rate', id=p.id) }}">
+    <span style="font-size: 20px;"class="material-icons">&#xe8db;</span></a>
+  &nbsp; {{p.rate}} &nbsp; 
+  <a href="{{ url_for('add_rate', id=p.id) }}">
+    <span style="font-size: 20px;"class="material-icons">&#xe8dc;</span></a>
 </div>
-{% endfor %}
-{% for c in category %}
-<a href="{{url_for('category', id=c.id)}}" 
-class="btn btn-primary">{{ c.name }}</a>
 {% endfor %}
 {% endblock %}
 </div>
+<!-- 
+show categories
+{% for c in category %}
+<a href="{{url_for('category', id=c.id)}}" 
+class="btn btn-primary">{{ c.name }}</a>
+{% endfor %} 
+-->
