@@ -1,9 +1,10 @@
 import os
+from werkzeug.utils import secure_filename
+from sqlalchemy import func
 from app import app, db 
 from flask import render_template, flash, redirect, url_for
 from app.models import Products, Cart, Gallery, Category
-from app.forms import AddProductForm, AddCategoryForm
-from werkzeug.utils import secure_filename
+from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm
 
 
 @app.route('/')
@@ -25,8 +26,8 @@ def add_product():
         uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'],filename))
         url = (os.path.join('static/images',filename))
         p = Products(title=form.title.data, price=form.price.data,
-                    discounted=form.discounted.data, sold = 0,
-                    inventory=form.inventory.data, photo=url,category_id=c.id)
+                    discounted=form.discounted.data, sold=0, rate=0,
+                    inventory=form.inventory.data, photo=url, category_id=c.id)
         db.session.add(p)
         db.session.commit()
         images = form.photos.data
@@ -51,14 +52,29 @@ def add_category():
         db.session.commit()
         flash('New category added.')
         return redirect(url_for('add_product'))
-    return render_template('add_category.html', form=form)
+    category = Category.query.all()
+    return render_template('add_category.html', form=form, category=category)
 
 
-@app.route('/<int:id>', methods=['POST','GET'])
+@app.route('/c/<int:id>', methods=['POST','GET'])
 def category(id):
     pro = Products.query.filter_by(category_id=id).all()
     return render_template('products_category.html', pro=pro)
 
+
+@app.route('/filter', methods=['POST','GET'])
+def filter_products():
+    form = FilterProductsForm()
+    return render_template('filter.html', form=form)
+
+
+@app.route('/f', methods=['POST','GET'])
+def filter():
+    form = FilterProductsForm()
+    keyword = Products.query.filter(Products.title.contains(form.keyword.data),
+        Products.category==form.category.data).all()
+    #category = Products.query.filter(Products.category==form.category.data).all()
+    return render_template('keyword.html', keyword=keyword, category=category)
 
 
 @app.route('/manage', methods=['POST','GET'])
@@ -117,6 +133,14 @@ def cart(title):
     return redirect(url_for('products'))
 
 
+@app.route('/cart', methods=['POST','GET'])
+def show_cart():
+    c = Cart.query.all()
+    if not c:
+        flash('Your cart is empty!')
+    return render_template('cart.html', c=c)
+
+
 @app.route('/c/add/<int:id>', methods=['POST','GET'])
 def add_num(id):
     n = Cart.query.filter_by(id=id).first()
@@ -142,17 +166,25 @@ def reduce_num(id):
     return redirect(url_for('show_cart'))
 
 
-@app.route('/cart', methods=['POST','GET'])
-def show_cart():
-    c = Cart.query.all()
-    if not c:
-        flash('Your cart is empty!')
-    return render_template('cart.html', c=c)
-
-
 @app.route('/del/cart/<int:id>', methods=['GET', 'POST'])
 def delete_cart(id):
     del_cart = Cart.query.get(id)
     db.session.delete(del_cart)
     db.session.commit()
     return redirect(url_for('show_cart'))
+
+
+@app.route('/like/<int:id>', methods=['POST','GET'])
+def add_rate(id):
+    p = Products.query.filter_by(id=id).first()
+    p.rate += 1
+    db.session.commit()
+    return redirect(url_for('products'))
+
+
+@app.route('/dislike/<int:id>', methods=['POST','GET'])
+def reduce_rate(id):
+    p = Products.query.filter_by(id=id).first()
+    p.rate -= 1
+    db.session.commit()
+    return redirect(url_for('products'))
