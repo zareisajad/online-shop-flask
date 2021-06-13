@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block header %}Filter{% endblock %}
+{% block content %}
+<div class="row align-items-center justify-content-center">
+  <div class="col-md-4">
+      <div class="add-form">
+      <form method="POST" enctype="multipart/form-data" action="{{url_for('filter')}}" >
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+          <p>
+          	<b>{{ form.keyword.label }} </b>
+            {{ form.keyword(class_='add-form-fields')}}
+          </p>
+            <p>
+            <b>{{ form.category.label }}</b>
+            {{ form.category(class_='add-form-fields')}}
+          </p>
+          <p>
+            <b>{{ form.price_radio.label }}</b>
+            {{ form.price_radio}}
+          </p>
+             <p><b>Enter min - max price:</b></p>  
+            {{ form.min_price.label }}
+            {{ form.min_price(class_='minmax-form-fields')}}
+            {{ form.max_price.label }}
+            {{ form.max_price(class_='minmax-form-fields')}}      
+           <p>
+           	<br>
+           	<b>{{ form.property_radio.label }}</b>
+            {{ form.property_radio}}
+          </p>
+        </div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+      </form>
+    </div>
+  </div>
+</div><br>
+{% endblock %}
