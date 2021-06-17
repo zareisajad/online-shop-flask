@@ -1,19 +1,21 @@
 import os
-from werkzeug.utils import secure_filename
-from sqlalchemy import func
-from app import app, db 
+from datetime import time
 from flask import render_template, flash, redirect, url_for
+from sqlalchemy import desc, asc
+from werkzeug.utils import secure_filename
+from app import app, db 
 from app.models import Products, Cart, Gallery, Category
-from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm
+from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm, FilterPriceForm
 
 
 @app.route('/')
 def products():
+    form = FilterPriceForm()
     pic = Products.query.all()
     category = Category.query.all()
     if not pic:
         flash('There is no products yet. you can add from top menu')
-    return render_template('products.html', pic=pic, category=category)
+    return render_template('products.html', pic=pic, category=category,form=form)
 
 
 @app.route('/add', methods=['POST','GET'])
@@ -26,7 +28,7 @@ def add_product():
         uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'],filename))
         url = (os.path.join('static/images',filename))
         p = Products(title=form.title.data, price=form.price.data,
-                    discounted=form.discounted.data, sold=0, rate=0,
+                    discounted=form.discounted.data, sold=0, rate=0, 
                     inventory=form.inventory.data, photo=url, category_id=c.id)
         db.session.add(p)
         db.session.commit()
@@ -71,10 +73,52 @@ def filter_products():
 @app.route('/f', methods=['POST','GET'])
 def filter():
     form = FilterProductsForm()
-    keyword = Products.query.filter(Products.title.contains(form.keyword.data),
-        Products.category==form.category.data).all()
-    #category = Products.query.filter(Products.category==form.category.data).all()
-    return render_template('keyword.html', keyword=keyword, category=category)
+    keyword = Products.query.filter(
+        Products.title.contains(form.keyword.data),
+        Products.category==form.category.data,
+        Products.price>form.min_price.data,
+        Products.price<form.max_price.data
+        ).order_by(asc(Products.price)).all()
+    return render_template('keyword.html', keyword=keyword)
+
+
+@app.route('/popular', methods=['POST','GET'])
+def popular_filter():
+    keyword = Products.query.order_by(desc(Products.rate)).all()
+    return render_template('keyword.html', keyword=keyword)
+
+
+@app.route('/most-sold', methods=['POST','GET'])
+def sold_filter():
+    keyword = Products.query.order_by(desc(Products.sold)).all()
+    return render_template('keyword.html', keyword=keyword)
+
+
+@app.route('/expensive', methods=['POST','GET'])
+def expensive_filter():
+    keyword = Products.query.order_by(desc(Products.price)).all()
+    return render_template('keyword.html', keyword=keyword)
+
+
+@app.route('/cheapest', methods=['POST','GET'])
+def cheapest_filter():
+    keyword = Products.query.order_by(asc(Products.price)).all()
+    return render_template('keyword.html', keyword=keyword)
+
+
+@app.route('/new', methods=['POST','GET'])
+def newst_filter():
+    keyword = Products.query.order_by(desc(Products.date)).all()
+    return render_template('keyword.html', keyword=keyword)
+
+
+@app.route('/price-filter', methods=['POST','GET'])
+def price_filter():
+    form = FilterPriceForm()
+    keyword = Products.query.filter(
+        Products.price>form.min_price.data,
+        Products.price<form.max_price.data).all()
+    return render_template('keyword.html', keyword=keyword)
 
 
 @app.route('/manage', methods=['POST','GET'])
