@@ -1,8 +1,10 @@
 from app import db
+from datetime import datetime
 
 
 class Products(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
     photo = db.Column(db.String(200))
     title = db.Column(db.String)
     price = db.Column(db.Integer)
