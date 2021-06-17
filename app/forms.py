@@ -30,6 +30,11 @@ class AddCategoryForm(FlaskForm):
     submit = SubmitField('Add Category')
 
 
+class FilterPriceForm(FlaskForm):
+    min_price = StringField('from:')
+    max_price = StringField('to')
+
+
 class FilterProductsForm(FlaskForm):
     keyword = StringField('Keyword:')
     category = QuerySelectField('Category:',
