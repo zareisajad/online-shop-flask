@@ -3,6 +3,27 @@
 {% block header %}Products{% endblock %}
 <div class="container">
 {% block content %}
+<div style="float: inline-end;margin: 28px;">
+    <form method="get">
+      <button class="btn btn-primary type="submit" 
+      formaction="{{url_for('popular_filter')}}">Most Popular</button>
+      <button class="btn btn-primary type="submit" 
+      formaction="{{url_for('sold_filter')}}">Most Sold</button>
+      <button class="btn btn-primary type="submit" 
+      formaction="{{url_for('expensive_filter')}}">Most Expensive</button>
+      <button class="btn btn-primary type="submit" 
+      formaction="{{url_for('cheapest_filter')}}">Cheapest</button> 
+      <button class="btn btn-primary type="submit" 
+      formaction="{{url_for('newst_filter')}}">Newst</button>
+      </form>
+      <form method="GET, POST">
+      {{ form.min_price.label }}
+      {{ form.min_price(class_='minmax-form-fields')}}
+      {{ form.max_price.label }}
+      {{ form.max_price(class_='minmax-form-fields')}}
+      <button class="btn btn-primary type="submit" formaction="{{url_for('price_filter')}}">filter</button>
+      </form>
+</div>
 {% for p in pic %}
 <div class="card">
   <img class="img-card" src={{ p.photo }} style="width: 180px; height: 180px;">
@@ -27,10 +48,3 @@
 {% endfor %}
 {% endblock %}
 </div>
-<!-- 
-show categories
-{% for c in category %}
-<a href="{{url_for('category', id=c.id)}}" 
-class="btn btn-primary">{{ c.name }}</a>
-{% endfor %} 
--->
