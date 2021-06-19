@@ -30,19 +30,9 @@ class AddCategoryForm(FlaskForm):
     submit = SubmitField('Add Category')
 
 
-class FilterPriceForm(FlaskForm):
-    min_price = StringField('from:')
-    max_price = StringField('to')
-
-
 class FilterProductsForm(FlaskForm):
     keyword = StringField('Keyword:')
-    category = QuerySelectField('Category:',
-        query_factory=enabled_categories, allow_blank=True)
-    price_radio = RadioField('Price:', choices=[
-        ('value1','Most Sold'),
-        ('value2','Most Expensive'),('value3','Cheapest')])
-    property_radio = RadioField('Property:', choices=[
-        ('value1','Most Popular'),('value2','Newst')])
+    category = QuerySelectField(
+        'Category:',query_factory=enabled_categories, allow_blank=True)
     min_price = StringField('from:')
     max_price = StringField('to')
