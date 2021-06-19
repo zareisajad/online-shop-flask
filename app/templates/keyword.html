@@ -3,6 +3,19 @@
 {% block header %}Products{% endblock %}
 <div class="container">
 {% block content %}
+<div style="float: inline-end;margin: 28px;">
+    <form method="get">
+      <button class="btn btn-primary type="submit" 
+      formaction="{{url_for('popular_filter')}}">Most Popular</button>
+      <button class="btn btn-primary type="submit" 
+      formaction="{{url_for('sold_filter')}}">Most Sold</button>
+      <button class="btn btn-primary type="submit" 
+      formaction="{{url_for('expensive_filter')}}">Most Expensive</button>
+      <button class="btn btn-primary type="submit" 
+      formaction="{{url_for('cheapest_filter')}}">Cheapest</button> 
+      <button class="btn btn-primary type="submit" 
+      formaction="{{url_for('newst_filter')}}">Newst</button>
+</div>
 {% for p in keyword %}
 <div class="card">
   <img class="img-card" src={{ p.photo }} style="width: 180px; height: 180px;">
