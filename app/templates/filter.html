@@ -15,20 +15,11 @@
             <b>{{ form.category.label }}</b>
             {{ form.category(class_='add-form-fields')}}
           </p>
-          <p>
-            <b>{{ form.price_radio.label }}</b>
-            {{ form.price_radio}}
-          </p>
              <p><b>Enter min - max price:</b></p>  
             {{ form.min_price.label }}
             {{ form.min_price(class_='minmax-form-fields')}}
             {{ form.max_price.label }}
             {{ form.max_price(class_='minmax-form-fields')}}      
-           <p>
-           	<br>
-           	<b>{{ form.property_radio.label }}</b>
-            {{ form.property_radio}}
-          </p>
         </div>
         <button type="submit" class="btn btn-primary">Filter</button>
       </form>
