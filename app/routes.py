@@ -72,15 +72,47 @@ def filter_products():
 @app.route('/f', methods=['POST','GET'])
 def filter():
     form = FilterProductsForm()
+    global keyword
     keyword = Products.query.filter(
         Products.title.contains(form.keyword.data),
         Products.category==form.category.data,
         Products.price>form.min_price.data,
         Products.price<form.max_price.data
         ).order_by(asc(Products.price)).all()
-    return render_template('keyword.html', keyword=keyword)
+    return render_template('filter_resualt.html',  keyword=keyword)
 
 
+@app.route('/popular-filter', methods=['POST','GET'])
+def popular():
+    keyword.sort(key=lambda i: i.rate, reverse=True)
+    return render_template('filter_resualt.html', keyword=keyword)
+
+
+@app.route('/sold-filter', methods=['POST','GET'])
+def sold():
+    keyword.sort(key=lambda i: i.sold, reverse=True)
+    return render_template('filter_resualt.html', keyword=keyword)
+
+
+@app.route('/expensive_filter', methods=['POST','GET'])
+def expensive():
+    keyword.sort(key=lambda i: i.price, reverse=True)
+    return render_template('filter_resualt.html', keyword=keyword)
+
+
+@app.route('/cheapest-filter', methods=['POST','GET'])
+def cheapest():
+    keyword.sort(key=lambda i: i.price)
+    return render_template('filter_resualt.html', keyword=keyword)
+
+
+@app.route('/newst-filter', methods=['POST','GET'])
+def newst():
+    keyword.sort(key=lambda i: i.date, reverse=True)
+    return render_template('filter_resualt.html', keyword=keyword)
+
+
+# ------
 @app.route('/popular', methods=['POST','GET'])
 def popular_filter():
     keyword = Products.query.order_by(desc(Products.rate)).all()
