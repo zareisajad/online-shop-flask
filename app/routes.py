@@ -1,21 +1,19 @@
 import os
-from datetime import time
 from flask import render_template, flash, redirect, url_for
 from sqlalchemy import desc, asc
 from werkzeug.utils import secure_filename
 from app import app, db 
 from app.models import Products, Cart, Gallery, Category
-from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm, FilterPriceForm
+from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm
 
 
 @app.route('/')
 def products():
-    form = FilterPriceForm()
     pic = Products.query.all()
     category = Category.query.all()
     if not pic:
         flash('There is no products yet. you can add from top menu')
-    return render_template('products.html', pic=pic, category=category,form=form)
+    return render_template('products.html', pic=pic, category=category)
 
 
 @app.route('/add', methods=['POST','GET'])
@@ -27,9 +25,10 @@ def add_product():
         filename = secure_filename(uploaded_file.filename)
         uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'],filename))
         url = (os.path.join('static/images',filename))
-        p = Products(title=form.title.data, price=form.price.data,
-                    discounted=form.discounted.data, sold=0, rate=0, 
-                    inventory=form.inventory.data, photo=url, category_id=c.id)
+        p = Products(
+            title=form.title.data, price=form.price.data,
+            discounted=form.discounted.data, sold=0, rate=0, 
+            inventory=form.inventory.data, photo=url, category_id=c.id)
         db.session.add(p)
         db.session.commit()
         images = form.photos.data
@@ -109,15 +108,6 @@ def cheapest_filter():
 @app.route('/new', methods=['POST','GET'])
 def newst_filter():
     keyword = Products.query.order_by(desc(Products.date)).all()
-    return render_template('keyword.html', keyword=keyword)
-
-
-@app.route('/price-filter', methods=['POST','GET'])
-def price_filter():
-    form = FilterPriceForm()
-    keyword = Products.query.filter(
-        Products.price>form.min_price.data,
-        Products.price<form.max_price.data).all()
     return render_template('keyword.html', keyword=keyword)
 
 
