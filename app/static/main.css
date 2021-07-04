@@ -1,9 +1,11 @@
 * {box-sizing: border-box;}
-table {width: 100%;}
+table {
+  width: 100%;
+}
 th, td {
-    padding: 10px;
+    padding: 3px;
     text-align: center;
-    border: 1px solid black;
+    border: 1px solid rgba(202, 202, 202, 0.705);
     border-collapse: collapse;
 }
 .card {
@@ -52,9 +54,10 @@ th, td {
     list-style:none;
 }
 .total_amount {
-    background-color: #383838;
+    background-color: #ff0000;
     color: rgb(255, 255, 255);
-    width: 15%;
+    width: 200px;
+    border-radius: 5px;
 }
 .total_amount_text {
     font-size: 17px;
