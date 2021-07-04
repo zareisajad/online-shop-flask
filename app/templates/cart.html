@@ -5,7 +5,6 @@
   <tr>      
     <th>Final Amount</th>
     <th>Number</th>
-    <th>inventory</th>
     <th>price</th>
     <th>title</th>
     <th>photo</th>
@@ -27,7 +26,6 @@
       {{ p.number }}
       <a href="{{url_for('add_num', id=p.id)}}" class="btn btn-primary" >+</a>
     </td>
-    <td>{{ p.inventory}}</td>
     {% if not p.discounted %}
     <td>${{p.price}}</td>
     {% else %}
@@ -39,15 +37,16 @@
       style="width: 80px; height: 80px;"> 
     </td>
     <td>
-      <a name='delete' href="{{url_for('delete_cart', id=p.id)}}" class="btn btn-primary" >Remove</a>
+      <a name='delete' href="{{url_for('delete_cart', id=p.id)}}" >
+        <i class="material-icons" style="color:red">remove_circle</i></a>
     </td>
     {% set _ = total.append(amount) %}
     {% endfor %}
   </tr>
 </table>
-<div class="total_amount">
-<p class="total_amount_text">
-  <b>Total Amount : ${{ total | sum()  }}</b></p>
-</div>
+<a style="color: aliceblue;" class="btn btn-danger" > <b>Total Amount : ${{ total | sum()}}</b></a>
+<a href="{{url_for('final_amount')}}" class="btn btn-success" >تسویه حساب</a>
+<br>
+<br>
 {% endblock %}
   
