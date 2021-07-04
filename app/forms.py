@@ -1,9 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, MultipleFileField, RadioField
-from wtforms.validators import DataRequired, length
+from wtforms import StringField, SubmitField, MultipleFileField, PasswordField, TextField, IntegerField
+from wtforms.fields.simple import TextAreaField
+from wtforms.validators import DataRequired, Length, Email, ValidationError
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from app.models import Category
+from app.models import Category, User
 
 
 def enabled_categories():
@@ -36,3 +37,38 @@ class FilterProductsForm(FlaskForm):
         'Category:',query_factory=enabled_categories, allow_blank=True)
     min_price = StringField('from:')
     max_price = StringField('to')
+    
+
+class RegisterationForm(FlaskForm):
+    name = StringField(
+        'Name And Lastname:', validators=[DataRequired(
+        message='please enter your name')])
+    email = StringField(
+        'Email:', validators=[DataRequired(message='please enter your email'),
+        Email(check_deliverability=True,message='email is not valid - try again')])
+    password = PasswordField(
+        'Password:', validators=[DataRequired(message='Enter your password'),
+        Length(min=6,max=12,message='password must be 6 to 12 char')])
+    
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user is not None:
+            raise ValidationError('Email is already in use.')
+    
+
+class LoginForm(FlaskForm): 
+    email = StringField(
+        'Email:', validators=[DataRequired(message='please enter your email'),
+        Email(check_deliverability=True,message='email is not valid - try again')])
+    password = PasswordField(
+        'Password:', validators=[DataRequired(message='Enter your password'),
+        Length(min=6,max=12,message='password must be 6 to 12 char')])
+    
+    
+class CheckoutForm(FlaskForm):
+    name = StringField('Name and lastname:', validators=[DataRequired()])
+    country = StringField('country:', validators=[DataRequired()])
+    city =  StringField('city:', validators=[DataRequired()])
+    address =  TextField('Address:', validators=[DataRequired()])
+    phone =  StringField('Phone:', validators=[DataRequired()])
+    email = StringField('Email:', validators=[DataRequired()])
