@@ -1,5 +1,7 @@
-from app import db
+from app import db, login, app
 from datetime import datetime
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class Products(db.Model):
@@ -16,6 +18,28 @@ class Products(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('Category', backref='category')
 
+    
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120))
+    email = db.Column(db.String(120), index=True, unique=True)
+    password_hash = db.Column(db.String(128))
+
+    def __repr__(self):
+        return '<User {}>'.format(self.name)
+    
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+        
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+
+class Cart(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    #product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    #user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -31,11 +55,6 @@ class Gallery(db.Model):
     p_id = db.Column(db.Integer, db.ForeignKey('products.id'))
 
 
-class Cart(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    photo = db.Column(db.String(200))
-    title = db.Column(db.String)
-    price = db.Column(db.Integer)
-    inventory = db.Column(db.Integer)
-    discounted = db.Column(db.Integer)
-    number = db.Column(db.Integer)
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
