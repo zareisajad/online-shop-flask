@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+<h1>{% block title %}Login{% endblock %}</h1>
+{% block header %}Login{% endblock %}
+{% block content %}
+<div class="row align-items-center justify-content-center">
+    <div class="col-md-4">
+        <div class="add-form">
+        <form method="POST" enctype="multipart/form-data">
+          {{ form.hidden_tag() }}
+          <div class="form-group">
+            <p>
+              {{ form.email.label }}<br>
+              {{ form.email(class_='add-form-fields') }}<br>
+            </p>
+            <p>
+              {{ form.password.label }}<br>
+              {{ form.password(class_='add-form-fields')}}<br>
+            </p>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form> <br>
+        <span>New user?</span> <a href="{{ url_for('register') }}">click here to register</a>
+      </div>
+    </div>
+  </div><br>
+{% endblock %}
