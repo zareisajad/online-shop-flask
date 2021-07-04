@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block header %}checkout{% endblock %}
+{% block content %}
+
+<div style="width:50%;float:left;margin-left:30px;background-color:rgb(228, 229, 230);padding:20px;border-radius:10px">
+        {% for p in c %}   
+        <hr>
+        <img class="card-img-top" src="{{p.photo}}" 
+        style="width:50px;height:50px;float:right;margin-top:-13px;margin-left:10px;">
+        <span style="float: right;">
+           <b>{{p.number}}x</b>  |
+            {{p.title}} 
+        </span>
+        <b>{{p.amount}}</b>
+        {% endfor %}
+        <hr>
+        <span style="background-color: rgb(255, 43, 5);color:rgb(255, 255, 255);padding:5px;border-radius:5px;margin-top:25px">Total: <b>{{c[-1].total}}</b> </span>
+    </div>
+    <form style="width:40%;float:right;margin-right:70px">
+        <div class="form-row">
+        <div class="form-group col-md-12">
+            {{ form.name.label }}
+            {{ form.name(class_='add-form-fields')}}
+        </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.country.label }}
+                {{ form.country(class_='add-form-fields')}}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.city.label }}
+                {{ form.city(class_='add-form-fields')}}
+            </div>
+            <div class="form-group col-md-12">
+                {{ form.address.label }}
+                {{ form.address(class_='add-form-fields')}}
+            </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-12">
+            {{ form.phone.label }}
+            {{ form.phone(class_='add-form-fields')}}
+        </div>
+        <div class="form-group col-md-12">
+            {{ form.email.label }}
+            {{ form.email(class_='add-form-fields') }}<br>
+        </div>
+     </div>
+     <button style="width: 100%;" type="submit" class="btn btn-primary">ثبت سفارش</button>
+      </form><br>
+
+{% endblock %}
