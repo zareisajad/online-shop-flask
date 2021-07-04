@@ -1,10 +1,56 @@
 import os
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from sqlalchemy import desc, asc
 from werkzeug.utils import secure_filename
 from app import app, db 
-from app.models import Products, Cart, Gallery, Category
-from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm
+from app.models import Products, Cart, Gallery, Category, User
+from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm, RegisterationForm, LoginForm, CheckoutForm
+from flask_login import current_user, login_user, logout_user, login_required
+from werkzeug.urls import url_parse
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('products'))
+    form = RegisterationForm()
+    if form.validate_on_submit():
+        user = User(
+            name=form.name.data,
+            email=form.email.data,)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('You are now a registered user - have fun')
+        return redirect(url_for('login'))
+    return render_template('register.html', form=form)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('products'))   
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is None:
+            flash('We cant find a user with this email - please register first!')
+            return redirect(url_for('login'))
+        elif user and not user.check_password(form.password.data):
+            flash('password is wrong')
+            return redirect(url_for('login'))
+        login_user(user)
+        next_page = request.args.get('next')
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = url_for('products')
+        return redirect(next_page)
+    return render_template('login.html', form=form)
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('products'))
 
 
 @app.route('/')
@@ -79,40 +125,44 @@ def filter():
         Products.price>form.min_price.data,
         Products.price<form.max_price.data
         ).order_by(asc(Products.price)).all()
-    return render_template('filter_resualt.html',  keyword=keyword)
+    return render_template('filter_resualt.html', keyword=keyword)
 
 
 @app.route('/popular-filter', methods=['POST','GET'])
 def popular():
     keyword.sort(key=lambda i: i.rate, reverse=True)
-    return render_template('filter_resualt.html', keyword=keyword)
+    return render_template(
+        'filter_resualt.html', keyword=keyword)
 
 
 @app.route('/sold-filter', methods=['POST','GET'])
 def sold():
     keyword.sort(key=lambda i: i.sold, reverse=True)
-    return render_template('filter_resualt.html', keyword=keyword)
+    return render_template(
+        'filter_resualt.html', keyword=keyword)
 
 
 @app.route('/expensive_filter', methods=['POST','GET'])
 def expensive():
     keyword.sort(key=lambda i: i.price, reverse=True)
-    return render_template('filter_resualt.html', keyword=keyword)
+    return render_template(
+        'filter_resualt.html', keyword=keyword)
 
 
 @app.route('/cheapest-filter', methods=['POST','GET'])
 def cheapest():
     keyword.sort(key=lambda i: i.price)
-    return render_template('filter_resualt.html', keyword=keyword)
+    return render_template(
+        'filter_resualt.html', keyword=keyword)
 
 
 @app.route('/newst-filter', methods=['POST','GET'])
 def newst():
     keyword.sort(key=lambda i: i.date, reverse=True)
-    return render_template('filter_resualt.html', keyword=keyword)
+    return render_template(
+        'filter_resualt.html', keyword=keyword)
 
 
-# ------
 @app.route('/popular', methods=['POST','GET'])
 def popular_filter():
     keyword = Products.query.order_by(desc(Products.rate)).all()
@@ -181,21 +231,22 @@ def product_detail(id):
          gallery=gallery, category=category)
 
 
-@app.route('/cart/<title>', methods=['POST','GET'])
-def cart(title):
-    c = Cart.query.filter_by(title=title).first()
-    if not c:
-        p = Products.query.filter_by(title=title).first()
-        cart = Cart(
-            photo=p.photo, title=p.title,number=0,
-            price=p.price, discounted=p.discounted, inventory=p.inventory)
-        db.session.add(cart)
-        db.session.commit()
-        flash('Added to your cart!')
-        return redirect(url_for('products'))
-    else: 
-        flash('This item is already in your cart!')
-        return redirect(url_for('products'))
+@app.route('/checkout', methods=['POST','GET'])
+@login_required
+def checkout():
+    form = CheckoutForm()
+    c = Cart.query.all()
+    return render_template('checkout.html', c=c, form=form)
+
+
+@app.route('/cart/<int:id>', methods=['POST','GET'])
+@login_required
+def cart(id):
+    p = Products.query.filter(Products.id==id).first()
+    c = Cart(user_id=p)
+    db.session.add(c)
+    db.session.commit()
+    flash('Added to your cart!')
     return redirect(url_for('products'))
 
 
@@ -205,6 +256,31 @@ def show_cart():
     if not c:
         flash('Your cart is empty!')
     return render_template('cart.html', c=c)
+
+
+@app.route('/del/cart/<int:id>', methods=['GET', 'POST'])
+def delete_cart(id):
+    del_cart = Cart.query.get(id)
+    db.session.delete(del_cart)
+    db.session.commit()
+    return redirect(url_for('show_cart'))
+
+
+@app.route('/fa', methods=['GET', 'POST'])
+def final_amount():
+    c = Cart.query.all()
+    total = []
+    for i in c:
+        if not i.discounted:
+            amount = i.number * i.price
+        else:
+            amount = i.number * i.discounted
+        total.append(amount)
+        total_amount = sum(total)
+        i.amount = amount
+        i.total = total_amount
+        db.session.commit()
+    return redirect(url_for('checkout'))
 
 
 @app.route('/c/add/<int:id>', methods=['POST','GET'])
@@ -229,14 +305,6 @@ def reduce_num(id):
         db.session.commit()
     else:
         return redirect(url_for('show_cart'))
-    return redirect(url_for('show_cart'))
-
-
-@app.route('/del/cart/<int:id>', methods=['GET', 'POST'])
-def delete_cart(id):
-    del_cart = Cart.query.get(id)
-    db.session.delete(del_cart)
-    db.session.commit()
     return redirect(url_for('show_cart'))
 
 
