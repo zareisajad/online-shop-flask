@@ -1,10 +1,14 @@
 import os
+import datetime 
+from datetime import timedelta
+import humanize
 from flask import render_template, flash, redirect, url_for, request
 from sqlalchemy import desc, asc
 from werkzeug.utils import secure_filename
 from app import app, db 
-from app.models import Products, Cart, Gallery, Category, User
-from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm, RegisterationForm, LoginForm, CheckoutForm
+from app.models import Products, Cart, Gallery, Category, User, Orders
+from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm,\
+                      RegisterationForm, LoginForm, CheckoutForm
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
@@ -17,7 +21,8 @@ def register():
     if form.validate_on_submit():
         user = User(
             name=form.name.data,
-            email=form.email.data,)
+            email=form.email.data
+            )
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -34,7 +39,10 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None:
-            flash('We cant find a user with this email - please register first!')
+            flash(
+                '''We cant find a user with this email
+                - please register first!'''
+                  )
             return redirect(url_for('login'))
         elif user and not user.check_password(form.password.data):
             flash('password is wrong')
@@ -62,7 +70,7 @@ def products():
     return render_template('products.html', pic=pic, category=category)
 
 
-@app.route('/add', methods=['POST','GET'])
+@app.route('/add-product', methods=['POST','GET'])
 def add_product():
     form = AddProductForm()
     if form.validate_on_submit():
@@ -100,10 +108,11 @@ def add_category():
         flash('New category added.')
         return redirect(url_for('add_product'))
     category = Category.query.all()
-    return render_template('add_category.html', form=form, category=category)
+    return render_template(
+        'add_category.html', form=form, category=category)
 
 
-@app.route('/c/<int:id>', methods=['POST','GET'])
+@app.route('/category/<int:id>', methods=['POST','GET'])
 def category(id):
     pro = Products.query.filter_by(category_id=id).all()
     return render_template('products_category.html', pro=pro)
@@ -231,81 +240,120 @@ def product_detail(id):
          gallery=gallery, category=category)
 
 
-@app.route('/checkout', methods=['POST','GET'])
+@app.route('/orders-list', methods=['POST','GET'])
+def orders():
+    o = Orders.query.all()
+    u = User.query.filter(User.id==Orders.orders_id).all()
+    c = Cart.query.filter(Cart.cart_id==Orders.orders_id).all()
+    return render_template(
+        'orders.html', orders=o, user=u, cart=c ,zip=zip)
+
+
+@app.route('/order<int:id>', methods=['POST','GET'])
+def order_line(id):
+    u = User.query.filter(User.id==id).all()
+    c = Cart.query.filter(Cart.cart_id==id).all()
+    p = Products.query.filter(Products.id==Cart.product_id).all()
+    return render_template(
+        'order_line.html',user=u, cart=c, product=p ,zip=zip)
+
+
+@app.route('/user-checkout', methods=['POST','GET'])
 @login_required
 def checkout():
+    c = Cart.query.filter(Cart.cart_id==current_user.id).all()
+    p = Products.query.filter(Products.id==Cart.product_id).all()
     form = CheckoutForm()
-    c = Cart.query.all()
-    return render_template('checkout.html', c=c, form=form)
+    '''
+    TODO everytime we go in checkout page an order stores in db
+           fix it. (check orders table if forgot)
+    '''
+    orders = Orders(status='پرداخت نشده', orders_id=current_user.id)
+    db.session.add(orders)
+    db.session.commit()
+    return render_template('checkout.html', c=c, p=p, form=form, zip=zip)
 
 
 @app.route('/cart/<int:id>', methods=['POST','GET'])
 @login_required
 def cart(id):
-    p = Products.query.filter(Products.id==id).first()
-    c = Cart(user_id=p)
-    db.session.add(c)
+    ca = Cart.query.filter(
+        Cart.product_id==id,
+        Cart.cart_id==current_user.id).first()
+    if ca:
+        flash('This item is already in cart!')
+    else:
+        c = Cart(product_id=id, number=1, amount=0,
+                 total=0, cart_id=current_user.id)
+        db.session.add(c)
     db.session.commit()
-    flash('Added to your cart!')
     return redirect(url_for('products'))
 
 
-@app.route('/cart', methods=['POST','GET'])
-def show_cart():
-    c = Cart.query.all()
+@app.route('/user-<int:id>', methods=['POST','GET'])
+def show_cart(id):
+    c = Cart.query.filter(Cart.cart_id==current_user.id).all()
     if not c:
         flash('Your cart is empty!')
-    return render_template('cart.html', c=c)
+    p = Products.query.filter(Products.id==Cart.product_id).all()
+    return render_template('cart.html', p=p, c=c, zip=zip)
 
 
 @app.route('/del/cart/<int:id>', methods=['GET', 'POST'])
 def delete_cart(id):
-    del_cart = Cart.query.get(id)
+    del_cart = Cart.query.filter(Cart.cart_id==current_user.id).first()
     db.session.delete(del_cart)
     db.session.commit()
-    return redirect(url_for('show_cart'))
+    return redirect(url_for('show_cart', id=current_user.id))
 
 
 @app.route('/fa', methods=['GET', 'POST'])
 def final_amount():
-    c = Cart.query.all()
+    c = Cart.query.filter(Cart.cart_id==current_user.id).all()
+    p = Products.query.filter(Products.id==Cart.product_id).all()
     total = []
-    for i in c:
+    for a,i in zip(c, p):
         if not i.discounted:
-            amount = i.number * i.price
+            amount = a.number * i.price
         else:
-            amount = i.number * i.discounted
+            amount = a.number * i.discounted
         total.append(amount)
         total_amount = sum(total)
-        i.amount = amount
-        i.total = total_amount
+        a.amount = amount
+        a.total = total_amount
         db.session.commit()
     return redirect(url_for('checkout'))
 
 
 @app.route('/c/add/<int:id>', methods=['POST','GET'])
 def add_num(id):
-    n = Cart.query.filter_by(id=id).first()
-    if n.inventory == 0:
+    c = Cart.query.filter(
+        Cart.product_id==id, Cart.cart_id==current_user.id).first()
+    p = Products.query.filter_by(id=id).first()
+    if  p.inventory == 0:
         flash('You picked up the last one - there is nothing left')
-        return redirect(url_for('show_cart'))
+        return redirect(url_for('show_cart', id=current_user.id))
     else:
-        n.number += 1
-        n.inventory -= 1
+        c.date = datetime.datetime.now()
+        c.number += 1
+        p.inventory -= 1
         db.session.commit()
-    return redirect(url_for('show_cart'))
+    return redirect(url_for('show_cart', id=current_user.id))
 
 
 @app.route('/c/reduce/<int:id>', methods=['POST','GET'])
 def reduce_num(id):
-    n = Cart.query.filter_by(id=id).first()
-    if n.number != 0:
-        n.number -= 1
-        n.inventory += 1
+    c = Cart.query.filter(
+        Cart.product_id==id, Cart.cart_id==current_user.id).first()
+    p = Products.query.filter_by(id=id).first()
+    if c.number != 0:
+        c.date = datetime.datetime.now()
+        c.number -= 1
+        p.inventory += 1
         db.session.commit()
     else:
-        return redirect(url_for('show_cart'))
-    return redirect(url_for('show_cart'))
+        return redirect(url_for('show_cart',id=current_user.id))
+    return redirect(url_for('show_cart',id=current_user.id))
 
 
 @app.route('/like/<int:id>', methods=['POST','GET'])

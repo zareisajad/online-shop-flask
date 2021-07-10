@@ -2,8 +2,8 @@
 <h1>{% block title %}Products{% endblock %}</h1>
 {% block header %}Products{% endblock %}
 <div class="container">
-{% block content %}
-<div style="float: inline-end;margin: 28px;">
+  {% block content %}
+<div style="width:100%; margin: 20px;">
   <form method="get">
     <button class="btn btn-primary" type="submit" 
     formaction="{{url_for('popular_filter')}}">Most Popular
@@ -38,7 +38,6 @@
     {% endif %}
     <a href="{{url_for('cart', id=p.id)}}" class="btn btn-primary">Add To Cart</a>
     <a href="{{url_for('product_detail', id=p.id)}}" class="btn btn-primary">Details</a>
-    
   </div>
   <a href="{{ url_for('reduce_rate', id=p.id) }}">
     <span style="font-size: 20px;"class="material-icons">&#xe8db;</span></a>

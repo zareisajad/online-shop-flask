@@ -24,7 +24,7 @@ th, td {
     text-overflow: ellipsis;
     word-break: break-all;
 }
-.img-card {border-radius: 90px;}
+.img-card {border-radius: 5px;}
 @media screen and (max-width: 600px) {
     .card {
       width: 90%;

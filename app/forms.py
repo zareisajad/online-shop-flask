@@ -72,3 +72,4 @@ class CheckoutForm(FlaskForm):
     address =  TextField('Address:', validators=[DataRequired()])
     phone =  StringField('Phone:', validators=[DataRequired()])
     email = StringField('Email:', validators=[DataRequired()])
+    submit = SubmitField('ثبت شفارش')

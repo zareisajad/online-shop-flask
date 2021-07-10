@@ -24,6 +24,9 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(120))
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    cart = db.relationship('Cart', backref='cart')
+    orders = db.relationship('Orders', backref='orders')
+
 
     def __repr__(self):
         return '<User {}>'.format(self.name)
@@ -37,8 +40,19 @@ class User(db.Model, UserMixin):
 
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    #product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
-    #user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    date = db.Column(db.DateTime, default=datetime.now)
+    product_id = db.Column(db.Integer)
+    number = db.Column(db.Integer)
+    amount = db.Column(db.Integer)
+    total = db.Column(db.Integer)
+    cart_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+
+class Orders(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.String)
+    date = db.Column(db.DateTime, default=datetime.now)
+    orders_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 class Category(db.Model):

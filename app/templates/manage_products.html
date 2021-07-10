@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 <h1>{% block title %}Manage Products{% endblock %}</h1>
 {% block header %}Manage Products{% endblock %}
-
 {% block content %}
 <table class="table table-bordered">
     <tr>
@@ -21,8 +20,7 @@
       <td>${{pic.price}}</td>
       <td>{{pic.title}}</td>
       <td>
-        <img class="card-img-top" src="{{pic.photo}}" 
-            style="width: 80px; height: 80px;"> 
+        <img class="card-img-top" src="{{pic.photo}}" style="width: 80px; height: 80px;"> 
       </td>
       <td>
         <a name='delete' href="{{url_for('delete', id=pic.id)}}" class="btn btn-primary" >Delete</a>

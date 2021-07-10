@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block header %}Orders List{% endblock %}
+{% block content %}
+<table style="margin-left:auto;margin-right:auto;width:1200px;">
+    <tr>      
+        <th>total amount</th>
+        <th>date created</th>
+        <th>last update</th>
+        <th>status</th>
+        <th>order</th>
+    </tr>
+    {% for i,a,c in zip(user,orders,cart) %}
+    <tr>
+        <td>{{c.total}}</td>
+        <td>{{a.date.strftime('%b.%d %H:%M')}}</td>
+        <td>{{c.date.strftime('%b.%d %H:%M')}}</td>
+        <td>{{a.status}}</td>
+        <td><a href="{{ url_for('order_line', id=a.id) }}">{{i.name}}</a></td>
+    </td>
+    {% endfor %}
+    </tr>
+  </table>
+<br>
+{% endblock %}

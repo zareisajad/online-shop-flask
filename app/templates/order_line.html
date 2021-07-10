@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block header %}Orders details{% endblock %}
+{% block content %}
+<table style="margin-left: auto; margin-right: auto;width: 1200px;">
+    <tr>      
+        <th>total</th>
+        <th>price</th>
+        <th>number</th>
+        <th>item</th>
+    </tr>
+    {% set total = [] %}
+    {% for p,c in zip(product,cart) %}   
+    <tr>
+        <td>
+            {% if not p.discounted %}
+            {% set amount =  c.number * p.price %}
+            {% else %}
+            {% set amount =  c.number * p.discounted %}      
+            {% endif %}  
+            ${{c.amount}}
+        </td>
+        <td>
+        {% if not p.discounted %}
+        {{p.price}} 
+        {% else %}
+        {{p.discounted}}
+        {% endif %}  
+        </td>
+        <td>{{c.number}}</td>
+        <td>
+            {{p.title}}
+            <img class="card-img-top" src="{{p.photo}}" style="width: 40px; height: 40px;"> 
+        </td>
+    </td>
+    {% set _ = total.append(amount) %}
+    {% endfor %}
+    </tr>
+</table>
+<a style="color: aliceblue;" class="btn btn-danger"><b>Total Amount : ${{ total | sum()}}</b></a>
+<br>
+{% endblock %}

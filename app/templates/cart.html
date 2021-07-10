@@ -11,33 +11,32 @@
     <th></th>
   </tr>
   {% set total = [] %}
-  {% for p in c %}   
+  {% for i,a in zip(p,c) %}
   <tr>
     <td>
-      {% if not p.discounted %}
-      {% set amount =  p.number * p.price %}
+      {% if not i.discounted %}
+      {% set amount =  a.number * i.price %}
       {% else %}
-      {% set amount =  p.number * p.discounted %}      
+      {% set amount =  a.number * i.discounted %}      
       {% endif %}  
       ${{ amount }}
     </td>
     <td>
-      <a href="{{url_for('reduce_num', id=p.id)}}" class="btn btn-primary" >-</a>
-      {{ p.number }}
-      <a href="{{url_for('add_num', id=p.id)}}" class="btn btn-primary" >+</a>
+      <a href="{{url_for('reduce_num', id=i.id)}}" class="btn btn-primary" >-</a>
+      {{ a.number }}
+      <a href="{{url_for('add_num', id=i.id)}}" class="btn btn-primary" >+</a>
     </td>
-    {% if not p.discounted %}
-    <td>${{p.price}}</td>
+    {% if not i.discounted %}
+    <td>${{i.price}}</td>
     {% else %}
-    <td>${{ p.discounted}}</td>
+    <td>${{ i.discounted}}</td>
     {% endif %}  
-    <td>{{p.title}}</td>
+    <td>{{i.title}}</td>
     <td>
-      <img class="card-img-top" src="{{p.photo}}" 
-      style="width: 80px; height: 80px;"> 
+      <img class="card-img-top" src="{{i.photo}}" style="width: 80px; height: 80px;"> 
     </td>
     <td>
-      <a name='delete' href="{{url_for('delete_cart', id=p.id)}}" >
+      <a name='delete' href="{{url_for('delete_cart', id=i.id)}}" >
         <i class="material-icons" style="color:red">remove_circle</i></a>
     </td>
     {% set _ = total.append(amount) %}
@@ -49,4 +48,3 @@
 <br>
 <br>
 {% endblock %}
-  
