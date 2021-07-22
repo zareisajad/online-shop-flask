@@ -240,32 +240,29 @@ def product_detail(id):
 
 @app.route('/orders-list', methods=['POST','GET'])
 def orders():
-    o = Orders.query.all()
-    u = User.query.filter(User.id==Orders.orders_id).all()
-    c = Cart.query.filter(Cart.cart_id==Orders.orders_id).all()
+    o = Orders.query.filter(Orders.orders_id==User.id).order_by(Orders.orders_id).all()
+    u = [User.query.filter(User.id==i.orders_id).first() for i in o]
+    c = [Cart.query.filter(Cart.cart_id==i.id).first() for i in u]
     return render_template(
         'orders.html', orders=o, user=u, cart=c ,zip=zip)
 
 
 @app.route('/order<int:id>', methods=['POST','GET'])
 def order_line(id):
+    o = Orders.query.filter(Orders.orders_id==id).first()
     u = User.query.filter(User.id==id).all()
     c = Cart.query.filter(Cart.cart_id==id).all()
     p =[Products.query.filter(Products.id==i.product_id).first() for i in c]
     return render_template(
-        'order_line.html',user=u, cart=c, product=p ,zip=zip)
+        'order_line.html',user=u, cart=c, product=p ,o=o, zip=zip)
 
 
 @app.route('/user-checkout', methods=['POST','GET'])
 @login_required
 def checkout():
+    form = CheckoutForm()
     c = Cart.query.filter(Cart.cart_id==current_user.id).all()
     p =[Products.query.filter(Products.id==i.product_id).first() for i in c]
-    form = CheckoutForm()
-    '''
-    TODO everytime we go in checkout page an order stores in db
-           fix it. (check orders table if forgot)
-    '''
     return render_template('checkout.html', c=c, p=p, form=form, zip=zip)
 
 
@@ -273,21 +270,56 @@ def checkout():
 @login_required
 def payment():
     form = CheckoutForm()
-    if form.payment.data == 'online':
-        orders = Orders(status='در انتظار پرداخت', orders_id=current_user.id, payment_method='آنلاین')
+    o = Orders.query.filter(Orders.orders_id==current_user.id).first()
+    # extracting user info enetred in checkout form
+    name = form.name.data
+    country = form.country.data
+    city = form.city.data
+    address = form.address.data
+    phone = form.phone.data
+    email = form.email.data
+    if not o:
+        orders = Orders(status='در انتظار پرداخت', orders_id=current_user.id,
+                        payment_method='آنلاین', name=name, country=country,
+                        city=city, address=address, phone=phone, email=email)
         db.session.add(orders)
-    else:
-        orders = Orders(status='در انتظار پرداخت', orders_id=current_user.id, payment_method='نقدی')
-        db.session.add(orders)
-    db.session.commit()
-    flash('سفارش با موفقیت ثبت شد')
-    return redirect(url_for('products'))
+        db.session.commit()
+    if form.payment.data == 'cash':
+        orders = Orders.query.filter(Orders.orders_id==current_user.id).first()
+        orders.payment_method = 'نقدی'
+        db.session.commit()
+        return redirect(url_for('products'))
+        flash('سفارش با موفقیت ثبت شد')
+    if o:
+        flash('این سفارش قبلا ثبت شده است')
+        return redirect(url_for('products'))
+    return redirect(url_for('payment_gateway', name='None'))
 
+
+@app.route('/payment-gateway/<name>', methods=['POST','GET'])
+@login_required
+def payment_gateway(name):
+    c = Cart.query.filter(Cart.cart_id==current_user.id).all()
+    if name == 'پرداخت':
+        orders = Orders.query.filter(Orders.orders_id==current_user.id).first()
+        orders.status = 'پرداخت شده'
+        flash('پرداخت موفق')
+        db.session.commit()
+        return redirect(url_for('products'))
+    if name == 'انصراف':
+        orders = Orders.query.filter(Orders.orders_id==current_user.id).first()
+        orders.status = 'کنسل شده'
+        flash('عملیات پرداخت کنسل شد')
+        db.session.commit()
+        return redirect(url_for('products'))
+    return render_template('gateway.html', c=c)
+    
 
 @app.route('/cart/<int:id>', methods=['POST','GET'])
 @login_required
 def cart(id):
-    ca = Cart.query.filter(Cart.product_id==id, Cart.cart_id==current_user.id).first()
+    ca = Cart.query.filter(Cart.product_id==id, 
+                           Cart.cart_id==current_user.id).first()
     if ca:
         flash('This item is already in cart!')
     else:
@@ -312,7 +344,8 @@ def show_cart(id):
 
 @app.route('/del/cart/<int:id>', methods=['GET', 'POST'])
 def delete_cart(id):
-    c = Cart.query.filter(Cart.cart_id==current_user.id, Cart.product_id==id).first()
+    c = Cart.query.filter(Cart.cart_id==current_user.id,
+                          Cart.product_id==id).first()
     db.session.delete(c)
     db.session.commit()
     return redirect(url_for('show_cart', id=current_user.id))
@@ -321,9 +354,9 @@ def delete_cart(id):
 @app.route('/fa', methods=['GET', 'POST'])
 def final_amount():
     c = Cart.query.filter(Cart.cart_id==current_user.id).all()
-    p = Products.query.filter(Products.id==Cart.product_id).all()
+    p = [Products.query.filter(Products.id==i.product_id).first() for i in c]
     total = []
-    for a,i in zip(c, p):
+    for a, i in zip(c, p):
         if not i.discounted:
             amount = a.number * i.price
         else:
@@ -338,7 +371,8 @@ def final_amount():
 
 @app.route('/c/add/<int:id>', methods=['POST','GET'])
 def add_num(id):
-    c = Cart.query.filter(Cart.product_id==id, Cart.cart_id==current_user.id).first()
+    c = Cart.query.filter(Cart.product_id==id,
+                          Cart.cart_id==current_user.id).first()
     p = Products.query.filter(Products.id==id).first()
     if  p.inventory == 0:
         flash('You picked up the last one - there is nothing left')
@@ -353,7 +387,8 @@ def add_num(id):
 
 @app.route('/c/reduce/<int:id>', methods=['POST','GET'])
 def reduce_num(id):
-    c = Cart.query.filter(Cart.product_id==id, Cart.cart_id==current_user.id).first()
+    c = Cart.query.filter(Cart.product_id==id,
+                          Cart.cart_id==current_user.id).first()
     p = Products.query.filter(Products.id==id).first()
     if c.number != 0:
         c.date = datetime.datetime.now()

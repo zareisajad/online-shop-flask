@@ -1,8 +1,8 @@
 """create tables
 
-Revision ID: aa7c279bfe77
+Revision ID: d7180d9c2aeb
 Revises: 
-Create Date: 2021-07-07 12:13:20.874963
+Create Date: 2021-07-22 16:23:43.694601
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'aa7c279bfe77'
+revision = 'd7180d9c2aeb'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -44,9 +44,16 @@ def upgrade():
     )
     op.create_table('orders',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('status', sa.String(), nullable=True),
-    sa.Column('date', sa.DateTime(), nullable=True),
     sa.Column('orders_id', sa.Integer(), nullable=True),
+    sa.Column('date', sa.DateTime(), nullable=True),
+    sa.Column('status', sa.String(), nullable=True),
+    sa.Column('payment_method', sa.String(), nullable=True),
+    sa.Column('name', sa.String(), nullable=True),
+    sa.Column('country', sa.String(), nullable=True),
+    sa.Column('city', sa.String(), nullable=True),
+    sa.Column('address', sa.String(), nullable=True),
+    sa.Column('phone', sa.String(), nullable=True),
+    sa.Column('email', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['orders_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

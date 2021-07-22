@@ -179,7 +179,7 @@ html, body {
 }
 
 .minmax-form-fields{
-    width: 100%;
+  width: 100%;
   background: #FAFAFA;
   border-radius: 0.3rem;
   border: 1px solid #8b8b8b4b;
@@ -190,4 +190,11 @@ html, body {
   box-shadow: 0 0 5px #6ab7e0;
   border:1px solid #66a3c4;
     list-style:none;
+}
+
+.user-info {
+   margin: auto;
+   width: 80%;
+   padding: 10px;
+   text-align: right;
 }

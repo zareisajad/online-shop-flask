@@ -49,10 +49,16 @@ class Cart(db.Model):
 
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.String)
-    date = db.Column(db.DateTime, default=datetime.now)
-    payment_method = db.Column(db.String)
     orders_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    date = db.Column(db.DateTime, default=datetime.now)
+    status = db.Column(db.String)
+    payment_method = db.Column(db.String)
+    name = db.Column(db.String)
+    country = db.Column(db.String)
+    city = db.Column(db.String)
+    address = db.Column(db.String)
+    phone = db.Column(db.String)
+    email = db.Column(db.String)
 
 
 class Category(db.Model):

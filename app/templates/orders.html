@@ -8,7 +8,6 @@
         <th>last update</th>
         <th>status</th>
         <th>order</th>
-        <th>payment method</th>
     </tr>
     {% for i,a,c in zip(user,orders,cart) %}
     <tr>
@@ -16,8 +15,6 @@
         <td>{{a.date.strftime('%b.%d %H:%M')}}</td>
         <td>{{c.date.strftime('%b.%d %H:%M')}}</td>
         <td>{{a.status}}</td>
-        <td>{{a.payment_method}}</td>
-
         <td><a href="{{ url_for('order_line', id=a.id) }}">{{i.name}}</a></td>
     </td>
     {% endfor %}
