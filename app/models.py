@@ -27,7 +27,6 @@ class User(db.Model, UserMixin):
     cart = db.relationship('Cart', backref='cart')
     orders = db.relationship('Orders', backref='orders')
 
-
     def __repr__(self):
         return '<User {}>'.format(self.name)
     
@@ -52,6 +51,7 @@ class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.String)
     date = db.Column(db.DateTime, default=datetime.now)
+    payment_method = db.Column(db.String)
     orders_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 

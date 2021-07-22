@@ -39,10 +39,8 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None:
-            flash(
-                '''We cant find a user with this email
-                - please register first!'''
-                  )
+            flash('''We cant find a user with this
+                    email please register first!''')
             return redirect(url_for('login'))
         elif user and not user.check_password(form.password.data):
             flash('password is wrong')
@@ -253,7 +251,7 @@ def orders():
 def order_line(id):
     u = User.query.filter(User.id==id).all()
     c = Cart.query.filter(Cart.cart_id==id).all()
-    p = Products.query.filter(Products.id==Cart.product_id).all()
+    p =[Products.query.filter(Products.id==i.product_id).first() for i in c]
     return render_template(
         'order_line.html',user=u, cart=c, product=p ,zip=zip)
 
@@ -262,47 +260,60 @@ def order_line(id):
 @login_required
 def checkout():
     c = Cart.query.filter(Cart.cart_id==current_user.id).all()
-    p = Products.query.filter(Products.id==Cart.product_id).all()
+    p =[Products.query.filter(Products.id==i.product_id).first() for i in c]
     form = CheckoutForm()
     '''
     TODO everytime we go in checkout page an order stores in db
            fix it. (check orders table if forgot)
     '''
-    orders = Orders(status='پرداخت نشده', orders_id=current_user.id)
-    db.session.add(orders)
-    db.session.commit()
     return render_template('checkout.html', c=c, p=p, form=form, zip=zip)
+
+
+@app.route('/user-payment', methods=['POST','GET'])
+@login_required
+def payment():
+    form = CheckoutForm()
+    if form.payment.data == 'online':
+        orders = Orders(status='در انتظار پرداخت', orders_id=current_user.id, payment_method='آنلاین')
+        db.session.add(orders)
+    else:
+        orders = Orders(status='در انتظار پرداخت', orders_id=current_user.id, payment_method='نقدی')
+        db.session.add(orders)
+    db.session.commit()
+    flash('سفارش با موفقیت ثبت شد')
+    return redirect(url_for('products'))
 
 
 @app.route('/cart/<int:id>', methods=['POST','GET'])
 @login_required
 def cart(id):
-    ca = Cart.query.filter(
-        Cart.product_id==id,
-        Cart.cart_id==current_user.id).first()
+    ca = Cart.query.filter(Cart.product_id==id, Cart.cart_id==current_user.id).first()
     if ca:
         flash('This item is already in cart!')
     else:
         c = Cart(product_id=id, number=1, amount=0,
                  total=0, cart_id=current_user.id)
         db.session.add(c)
+        flash('Added to cart!')
     db.session.commit()
     return redirect(url_for('products'))
 
 
 @app.route('/user-<int:id>', methods=['POST','GET'])
 def show_cart(id):
+    # get all the items that matchs with current_user.id in Cart table 
     c = Cart.query.filter(Cart.cart_id==current_user.id).all()
     if not c:
         flash('Your cart is empty!')
-    p = Products.query.filter(Products.id==Cart.product_id).all()
+    # get all the products
+    p =[Products.query.filter(Products.id==i.product_id).first() for i in c]
     return render_template('cart.html', p=p, c=c, zip=zip)
 
 
 @app.route('/del/cart/<int:id>', methods=['GET', 'POST'])
 def delete_cart(id):
-    del_cart = Cart.query.filter(Cart.cart_id==current_user.id).first()
-    db.session.delete(del_cart)
+    c = Cart.query.filter(Cart.cart_id==current_user.id, Cart.product_id==id).first()
+    db.session.delete(c)
     db.session.commit()
     return redirect(url_for('show_cart', id=current_user.id))
 
@@ -327,9 +338,8 @@ def final_amount():
 
 @app.route('/c/add/<int:id>', methods=['POST','GET'])
 def add_num(id):
-    c = Cart.query.filter(
-        Cart.product_id==id, Cart.cart_id==current_user.id).first()
-    p = Products.query.filter_by(id=id).first()
+    c = Cart.query.filter(Cart.product_id==id, Cart.cart_id==current_user.id).first()
+    p = Products.query.filter(Products.id==id).first()
     if  p.inventory == 0:
         flash('You picked up the last one - there is nothing left')
         return redirect(url_for('show_cart', id=current_user.id))
@@ -343,9 +353,8 @@ def add_num(id):
 
 @app.route('/c/reduce/<int:id>', methods=['POST','GET'])
 def reduce_num(id):
-    c = Cart.query.filter(
-        Cart.product_id==id, Cart.cart_id==current_user.id).first()
-    p = Products.query.filter_by(id=id).first()
+    c = Cart.query.filter(Cart.product_id==id, Cart.cart_id==current_user.id).first()
+    p = Products.query.filter(Products.id==id).first()
     if c.number != 0:
         c.date = datetime.datetime.now()
         c.number -= 1

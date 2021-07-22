@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, MultipleFileField, PasswordField, TextField, IntegerField
+from wtforms import StringField, SubmitField, MultipleFileField, PasswordField, TextField, IntegerField, RadioField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Length, Email, ValidationError
 from flask_wtf.file import FileField, FileRequired, FileAllowed
@@ -72,4 +72,5 @@ class CheckoutForm(FlaskForm):
     address =  TextField('Address:', validators=[DataRequired()])
     phone =  StringField('Phone:', validators=[DataRequired()])
     email = StringField('Email:', validators=[DataRequired()])
+    payment = RadioField('Label', choices=[('online'),('cash')])
     submit = SubmitField('ثبت شفارش')

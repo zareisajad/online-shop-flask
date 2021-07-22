@@ -14,9 +14,10 @@
         <b>{{p.amount}}</b>
         {% endfor %}
         <hr>
-        <span style="background-color: rgb(255, 43, 5);color:rgb(255, 255, 255);padding:5px;border-radius:5px;margin-top:25px">Total: <b>{{c[-1].total}}</b> </span>
+        <span style="background-color: rgb(255, 43, 5);color:rgb(255, 255, 255);
+        padding:5px;border-radius:5px;margin-top:25px">Total: <b>{{c[-1].total}}</b> </span>
     </div>
-    <form style="width:40%;float:right;margin-right:70px">
+    <form method="POST" enctype="multipart/form-data" action="/user-payment" style="width:40%;float:right;margin-right:70px">
         <div class="form-row">
         <div class="form-group col-md-12">
             {{ form.name.label }}
@@ -46,8 +47,12 @@
             {{ form.email.label }}
             {{ form.email(class_='add-form-fields') }}<br>
         </div>
-     </div>
-     <button style="width: 100%;" type="submit" class="btn btn-primary">ثبت سفارش</button>
-      </form><br>
-
+        <div class="form-group col-md-12">
+            <p>Payment method: </p>
+            {{ form.payment }}
+        </div>
+    </div>
+    <button style="width: 100%;" type="submit" class="btn btn-primary">ثبت سفارش</button>
+    </form>
+    <br>
 {% endblock %}
