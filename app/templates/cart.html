@@ -1,51 +1,48 @@
 {% extends 'base.html' %}
-{% block header %}Cart{% endblock %}
+{% block header %}سبد خرید{% endblock %}
 {% block content %}
-<table id="t01">
+<table>
   <tr>      
-    <th>Final Amount</th>
-    <th>Number</th>
-    <th>price</th>
-    <th>title</th>
-    <th>photo</th>
     <th></th>
+    <th>محصول</th>
+    <th>قیمت</th>
+    <th>تعداد</th>
+    <th>جمع قیمت</th>
   </tr>
   {% set total = [] %}
   {% for i,a in zip(p,c) %}
   <tr>
+    <td>
+      <a name='delete' href="{{url_for('delete_cart', id=i.id)}}">
+        <i class="material-icons" style="color:red">remove_circle</i></a>
+    </td>
+    <td style="text-align: right;">
+      <img class="card-img-top" src="{{i.photo}}" style="width:80px;height:80px;padding:5px;"> 
+      <span style="padding:10px">{{i.title}}</span>
+    </td>
+    {% if not i.discounted %}
+    <td>{{ '{0:,}'.format(i.price) }} تومان</td>
+    {% else %}
+    <td>{{ '{0:,}'.format(i.discounted) }} تومان</td>
+    {% endif %}  
+    <td>
+      <a href="{{url_for('add_num', id=i.id)}}" class="btn btn-primary" >+</a>
+      {{ a.number }} عدد
+      <a href="{{url_for('reduce_num', id=i.id)}}" class="btn btn-primary" >-</a>
+    </td>
     <td>
       {% if not i.discounted %}
       {% set amount =  a.number * i.price %}
       {% else %}
       {% set amount =  a.number * i.discounted %}      
       {% endif %}  
-      ${{ amount }}
+      {{ '{0:,}'.format(amount) }} تومان
     </td>
-    <td>
-      <a href="{{url_for('reduce_num', id=i.id)}}" class="btn btn-primary" >-</a>
-      {{ a.number }}
-      <a href="{{url_for('add_num', id=i.id)}}" class="btn btn-primary" >+</a>
-    </td>
-    {% if not i.discounted %}
-    <td>${{i.price}}</td>
-    {% else %}
-    <td>${{ i.discounted}}</td>
-    {% endif %}  
-    <td>{{i.title}}</td>
-    <td>
-      <img class="card-img-top" src="{{i.photo}}" style="width: 80px; height: 80px;"> 
-    </td>
-    <td>
-      <a name='delete' href="{{url_for('delete_cart', id=i.id)}}" >
-        <i class="material-icons" style="color:red">remove_circle</i></a>
-    </td>
-    {% set _ = total.append(amount) %}
-    {% endfor %}
+      {% set _ = total.append(amount) %}
+      {% endfor %}
   </tr>
 </table>
-<a style="color: aliceblue;" class="btn btn-danger" > <b>Total Amount : ${{ total | sum()}}</b></a>
+<a style="color: aliceblue;" class="btn btn-info">
+  <b>مبلغ نهایی: {{ '{0:,}'.format(total | sum()) }} تومان</b></a>
 <a href="{{url_for('final_amount')}}" class="btn btn-success" >تسویه حساب</a>
-
-<br>
-<br>
 {% endblock %}
