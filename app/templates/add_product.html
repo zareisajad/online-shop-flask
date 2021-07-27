@@ -1,45 +1,49 @@
 {% extends 'base.html' %}
-{% block header %}Add New Product{% endblock %}
+{% block header %}ایجاد محصول جدید{% endblock %}
 {% block content %}
-<div class="row align-items-center justify-content-center">
-  <div class="col-md-4">
-      <div class="add-form">
-      <form method="POST" enctype="multipart/form-data" accept="image/*" multiple>
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-          <p>
-            {{ form.photo.label }}<br>
-            {{ form.photo(class_='add-form-fields')}}<br>
-          </p>
-          <p>
-            {{ form.title.label }}<br>
-            {{ form.title(class_='add-form-fields') }}<br>
-          </p>
-          <p>
-            {{ form.price.label }}<br>
-            {{ form.price(class_='add-form-fields')}}<br>
-          </p>
-          <p>
-            {{ form.discounted.label }}<br>
-            {{ form.discounted(class_='add-form-fields')}}<br>
-          </p>
-          <p>
-            {{ form.inventory.label }}<br>
-            {{ form.inventory(class_='add-form-fields') }}<br>
-          </p>
-          <p>
-            {{ form.category.label }} <br>
-            {{ form.category(class_='add-form-fields') }}<br>
-            <a href="{{ url_for('add_category') }}">click here to add new category</a>
-          </p>
-          <p>
-            {{ form.photos.label }}<br>
-            {{ form.photos(class_='add-form-fields')}}<br>
-          </p>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+<div class="container">
+  <form style="width: 100%;" method="POST" enctype="multipart/form-data" accept="image/*" multiple>
+    {{form.hidden_tag() }}
+     <p>
+      {{ form.title.label(class_='form-label') }}<br>
+      {{ form.title(class_='product-form') }}
+    </p>
+    <p>
+      {{ form.short_desc.label(class_='form-label') }}<br>
+      {{ form.short_desc(class_='product-form') }}
+    </p>
+    <span style="margin-left: 20px;">
+      {{ form.price.label(class_='form-label')  }} 
+      {{ form.price(class_='form-price')}}
+    </span>
+    <span style="margin-left: 20px;">
+      {{ form.discounted.label(class_='form-label')  }}
+      {{ form.discounted(class_='form-price')}}
+    </span>
+    <span>
+      {{ form.inventory.label(class_='form-label')  }}
+      {{ form.inventory(class_='form-inventory') }}
+    </span>
+    <p>
+      <br>
+      {{ form.category.label(class_='form-label') }}<br>
+      {{ form.category(class_='form-category') }}<br>
+      <a href="{{ url_for('add_category') }}">دسته بندی جدید</a>
+      <br>
+    </p>
+    <p>
+      {{ form.desc.label(class_='form-label') }}<br>
+      {{ form.desc(class_='product-form') }}
+    </p>
+    <p>
+      {{ form.photo.label(class_='form-label')}} <br>
+      {{ form.photo(class_='product-form')}}
+    </p>
+    <p>
+      {{ form.photos.label(class_='form-label')}}<br>
+      {{ form.photos(class_='product-form')}}<br>
+    </p>
+        <button style="width: 70%;" type="submit" class="btn btn-primary">ذخیره محصول</button>
       </form>
-    </div>
-  </div>
 </div><br>
 {% endblock %}
