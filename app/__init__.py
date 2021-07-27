@@ -11,7 +11,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
-login.login_message = 'برای مشاهد این صفحه ابتدا وارد حساب کاربری شوید'
+login.login_message = 'ابتدا وارد حساب کاربری شوید'
 
 
 from app import app, routes
