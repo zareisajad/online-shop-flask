@@ -1,13 +1,12 @@
 {% extends 'base.html' %}
 {% block header %}Orders details{% endblock %}
 {% block content %}
-<div class="user-info" dir="rtl">
 <table >
     <tr>      
-        <th>item</th>
-        <th>number</th>
-        <th>price</th>
-        <th>total</th>
+        <th>محصول</th>
+        <th>تعداد</th>
+        <th>قیمت</th>
+        <th>جمع قیمت</th>
     </tr>
     {% set total = [] %}
     {% for p,c in zip(product,cart) %}   
@@ -19,9 +18,9 @@
         <td>{{c.number}}</td>
         <td>
             {% if not p.discounted %}
-            {{p.price}} 
+            {{'{0:,}'.format(p.price)}} تومان
             {% else %}
-            {{p.discounted}}
+            {{ '{0:,}'.format(p.discounted) }} تومان
             {% endif %}  
         </td>
         <td>
@@ -30,17 +29,18 @@
             {% else %}
             {% set amount =  c.number * p.discounted %}      
             {% endif %}  
-            ${{c.amount}}
+            {{'{0:,}'.format(c.amount)}} تومان
         </td>
     </td>
     {% set _ = total.append(amount) %}
     {% endfor %}
 </tr>
 </table>
-<a style="float: left;background-color: antiquewhite;"><b>Total Amount : ${{ total | sum()}}</b></a>
+<div class="user-info" dir="rtl">
+    <a style="float: left;"><b>مبلغ کل : {{ '{0:,}'.format(total | sum())}} تومان</b></a>
 <br>
 <hr>
-   <p>
+<p>
        <b>روش پرداخت :</b>
        {{o.payment_method}}
    </p>

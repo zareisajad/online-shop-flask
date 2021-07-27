@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-<h1>{% block title %}Login{% endblock %}</h1>
-{% block header %}Login{% endblock %}
+<h1>{% block title %}ورود {% endblock %}</h1>
+{% block header %}ورود{% endblock %}
 {% block content %}
 <div class="row align-items-center justify-content-center">
     <div class="col-md-4">
@@ -17,9 +17,9 @@
               {{ form.password(class_='add-form-fields')}}<br>
             </p>
           </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-primary">تائید</button>
         </form> <br>
-        <span>New user?</span> <a href="{{ url_for('register') }}">click here to register</a>
+        <span>عضو نیستید؟</span> <a href="{{ url_for('register') }}">برای ثبت نام کلیک کنید</a>
       </div>
     </div>
   </div><br>

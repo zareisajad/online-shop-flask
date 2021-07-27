@@ -1,43 +1,49 @@
 {% extends 'base.html' %}
-{% block header %}Product Details{% endblock %}
+{% block header %}جزئیات محصول{% endblock %}
 {% block content %}
 <body>
   <main class="container">
-    <!-- Left Column / Headphones Image -->
+    <!-- right Column / Image and gallery -->
     <div class="left-column">
       <img src="{{product.photo}}" class="img-detail" 
       style="width:500px;height:500px;">
-    </div>
-    <!-- Right Column -->
-    <div class="right-column">
-      <!-- Product Description -->
-      <div class="product-description">
-        <h1>{{product.title}}</h1>
-        <p> <b>Inventory :</b> {{product.inventory}}</p>
-        {% if product.sold is none %}
-        <p> <b>Sold Number :</b> 0</p>
-        {% else %}
-        <p> <b>Sold Number :</b> {{product.sold}}</p>
-        {% endif %} 
-        <p>Category: {{category.name}}</p>
-      </div>
-      <!-- Product Pricing -->
-      <div class="product-price">
-        <span><b>Price: </b><del>${{product.price}}</del></span>
-        <span><b>Discounted: ${{product.discounted}}</b></span>
-        <a href="{{url_for('cart', id=product.id)}}"class="btn btn-primary">Add To Cart</a>
-      </div>
-      <hr>
-      <div>
+      <div style="margin-right: 35px;text-align: right;">
       {% for i in gallery %}
       {% if i.p_id == product.id %}
       <img src="{{i.pics}}" 
       style="width:130px;height:130px;;margin:5px">
       {% endif %}
       {% endfor %}
+      </div>
     </div>
-    </div>
-  </main>
-  </html>    
-  {% endblock %}
-</body>
+    <!-- left Column -->
+    <div class="right-column">
+      <div class="product-description">
+        <h1>{{product.title}}</h1>
+        <p>دسته بندی: {{category.name}}</p>
+        <p>موجودی : {{product.inventory}} عدد</p>
+        <p>
+          {{product.short_desc}}
+        </p>
+      </div>
+      <!-- Product Pricing -->
+      <div class="product-price">
+        {% if product.discounted %}
+        <span><b><del>{{'{0:,}'.format(product.price | int)}} تومان</del></b></span>
+        &nbsp; &nbsp;
+        <span><b>{{'{0:,}'.format(product.discounted | int)}} تومان</b></span>
+        {% else %}
+        <span><b>{{'{0:,}'.format(product.price | int)}} تومان</b></span>
+        {% endif %}
+        &nbsp; &nbsp;
+        <a href="{{url_for('cart', id=product.id)}}"class="btn btn-primary">افزودن به سبد خرید</a>
+      </div>
+      <hr>
+      <p style="color: rgb(92, 92, 92);">
+        {{product.desc}}
+      </p>
+      </div>
+    </main>
+    </html>    
+    {% endblock %}
+  </body>

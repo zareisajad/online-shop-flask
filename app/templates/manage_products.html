@@ -1,30 +1,33 @@
 {% extends 'base.html' %}
-<h1>{% block title %}Manage Products{% endblock %}</h1>
-{% block header %}Manage Products{% endblock %}
+<h1>{% block title %}مدیریت محصولات{% endblock %}</h1>
+{% block header %}مدیریت محصولات{% endblock %}
 {% block content %}
-<table class="table table-bordered">
+<table >
     <tr>
-        <th>sold</th>
-        <th>inventory</th>
-        <th>discounted price</th>
-        <th>price</th> 
-        <th>title</th>
-        <th>photo</th>
-        <th></th>
+      <th></th>
+      <th>محصول</th>
+      <th>قیمت</th> 
+      <th>قیمت با تخفیف</th>
+      <th>موجودی</th>
+      <th>فروخته شده</th>
     </tr>
     {% for pic in products %}   
     <tr>
-      <td>{{pic.sold}}</td>
-      <td>{{pic.inventory}}</td>
-      <td>${{pic.discounted}}</td>
-      <td>${{pic.price}}</td>
-      <td>{{pic.title}}</td>
       <td>
-        <img class="card-img-top" src="{{pic.photo}}" style="width: 80px; height: 80px;"> 
+        <a name='delete' href="{{url_for('delete', id=pic.id)}}" class="btn btn-danger"> حذف </a>
       </td>
-      <td>
-        <a name='delete' href="{{url_for('delete', id=pic.id)}}" class="btn btn-primary" >Delete</a>
+      <td style="text-align: right;">
+        <img class="card-img-top" src="{{pic.photo}}" style="width: 70px; height: 70px;"> 
+        <span style="padding:10px">{{pic.title}}</span>
       </td>
+      <td>{{ '{0:,}'.format(pic.price | int) }} تومان</td>
+      {% if pic.discounted  %}
+      <td>{{ '{0:,}'.format(pic.discounted | int) }} تومان</td>
+      {% else %}
+      <td> - - - </td>
+      {% endif %}
+      <td>{{pic.inventory}} عدد</td>
+      <td>{{pic.sold}} عدد</td>
     {% endfor %}
     </tr>
 </table>

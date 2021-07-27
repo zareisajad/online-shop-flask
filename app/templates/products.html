@@ -1,27 +1,27 @@
 {% extends 'base.html' %}
-<h1>{% block title %}Products{% endblock %}</h1>
-{% block header %}Products{% endblock %}
+<h1>{% block title %}محصولات{% endblock %}</h1>
+{% block header %}محصولات{% endblock %}
 <div class="container">
   {% block content %}
-<div style="width:100%; margin: 20px;">
+<div class="filter-buttons">
   <form method="get">
     <button class="btn btn-primary" type="submit" 
-    formaction="{{url_for('popular_filter')}}">Most Popular
+    formaction="{{url_for('popular_filter')}}">محبوبترین
     </button>
     <button class="btn btn-primary" type="submit" 
-    formaction="{{url_for('sold_filter')}}">Most Sold
+    formaction="{{url_for('sold_filter')}}">پر فروشترین
     </button>
     <button class="btn btn-primary" type="submit" 
-    formaction="{{url_for('expensive_filter')}}">Most Expensive
+    formaction="{{url_for('expensive_filter')}}">گرانترین
     </button>
     <button class="btn btn-primary" type="submit" 
-    formaction="{{url_for('cheapest_filter')}}">Cheapest
+    formaction="{{url_for('cheapest_filter')}}">ارزانترین
     </button> 
     <button class="btn btn-primary" type="submit" 
-    formaction="{{url_for('newst_filter')}}">Newst
+    formaction="{{url_for('newst_filter')}}">جدیدترین
     </button>
     <button class="btn btn-info" type="submit" 
-    formaction="{{ url_for('filter_products') }}">Advanced Filter
+    formaction="{{ url_for('filter_products') }}">فیلتر پیشرفته
     </button>
 </div>
 {% for p in pic %}
@@ -30,14 +30,13 @@
   <div class="card-body">
     <h5 class="card-title">{{ p.title }}</h5>
     {% if not p.discounted %}
-    <p><b>Discounted: -------- </p></b>
-    <p style="color: red;"><b>Price: ${{p.price}}</p></b>
+    <p></p>
+    <p style="color: red;"><b> {{'{0:,}'.format(p.price|int)}} تومان</p></b>
     {% else %}
-    <p><b><del>Price:${{p.price}}</del></p></b>
-    <p style="color: red;"><b>Discounted: ${{p.discounted}}</p></b>
+    <p style="color: red;"><b>{{'{0:,}'.format(p.discounted|int)}} تومان</p></b>
     {% endif %}
-    <a href="{{url_for('cart', id=p.id)}}" class="btn btn-primary">Add To Cart</a>
-    <a href="{{url_for('product_detail', id=p.id)}}" class="btn btn-primary">Details</a>
+    <a style="padding: 3px;" href="{{url_for('cart', id=p.id)}}" class="btn btn-primary"><i style="padding: 5px;" class="material-icons">&#xe854;</i></a>
+    <a href="{{url_for('product_detail', id=p.id)}}" class="btn btn-primary" style="padding: 9px;">مشاهده</a>
   </div>
   <a href="{{ url_for('reduce_rate', id=p.id) }}">
     <span style="font-size: 20px;"class="material-icons">&#xe8db;</span></a>
