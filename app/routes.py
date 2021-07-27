@@ -26,7 +26,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('You are now a registered user - have fun')
+        flash('ثبت نام انجام شد')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
@@ -39,11 +39,10 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None:
-            flash('''We cant find a user with this
-                    email please register first!''')
+            flash('کاربری با ایمیل پیدا نشد')
             return redirect(url_for('login'))
         elif user and not user.check_password(form.password.data):
-            flash('password is wrong')
+            flash('رمز عبور اشتباه است')
             return redirect(url_for('login'))
         login_user(user)
         next_page = request.args.get('next')
@@ -64,7 +63,7 @@ def products():
     pic = Products.query.all()
     category = Category.query.all()
     if not pic:
-        flash('There is no products yet. you can add from top menu')
+        flash('محصولی موجود نیست')
     return render_template('products.html', pic=pic, category=category)
 
 
@@ -79,7 +78,8 @@ def add_product():
         url = (os.path.join('static/images',filename))
         p = Products(
             title=form.title.data, price=form.price.data,
-            discounted=form.discounted.data, sold=0, rate=0, 
+            discounted=form.discounted.data, sold=0, rate=0,
+            short_desc=form.short_desc.data, desc=form.desc.data,
             inventory=form.inventory.data, photo=url, category_id=c.id)
         db.session.add(p)
         db.session.commit()
@@ -91,7 +91,6 @@ def add_product():
             files = Gallery(pics=url, p_id=p.id)
             db.session.add(files)
         db.session.commit()
-        flash('Your product is live now!')
         return redirect(url_for('products'))
     return render_template('add_product.html', form=form)
 
@@ -103,7 +102,7 @@ def add_category():
         category = Category(name=form.name.data)
         db.session.add(category)
         db.session.commit()
-        flash('New category added.')
+        flash('دسته بندی جدید ایجاد شد')
         return redirect(url_for('add_product'))
     category = Category.query.all()
     return render_template(
@@ -204,7 +203,7 @@ def newst_filter():
 def manage_products():
     products = Products.query.all()
     if not products:
-        flash('There is no products yet. you can add from top menu')
+        flash('محصولی موجود نیست')
     return render_template('manage_products.html', products=products)
 
 
@@ -243,6 +242,8 @@ def orders():
     o = Orders.query.filter(Orders.orders_id==User.id).order_by(Orders.orders_id).all()
     u = [User.query.filter(User.id==i.orders_id).first() for i in o]
     c = [Cart.query.filter(Cart.cart_id==i.id).first() for i in u]
+    if not o:
+        flash('سفارشی ثبت نشده است')
     return render_template(
         'orders.html', orders=o, user=u, cart=c ,zip=zip)
 
@@ -284,7 +285,7 @@ def payment():
                         city=city, address=address, phone=phone, email=email)
         db.session.add(orders)
         db.session.commit()
-    if form.payment.data == 'cash':
+    if form.payment.data == 'نقدی':
         orders = Orders.query.filter(Orders.orders_id==current_user.id).first()
         orders.payment_method = 'نقدی'
         db.session.commit()
@@ -321,14 +322,14 @@ def cart(id):
     ca = Cart.query.filter(Cart.product_id==id, 
                            Cart.cart_id==current_user.id).first()
     if ca:
-        flash('This item is already in cart!')
+        flash('این محصول قبلا اضافه شده است')
     else:
         c = Cart(product_id=id, number=1, amount=0,
                  total=0, cart_id=current_user.id)
         db.session.add(c)
-        flash('Added to cart!')
+        flash('به سبد خرید اضافه شد')
     db.session.commit()
-    return redirect(url_for('products'))
+    return redirect(url_for('show_cart', id=current_user.id))
 
 
 @app.route('/user-<int:id>', methods=['POST','GET'])
@@ -336,7 +337,7 @@ def show_cart(id):
     # get all the items that matchs with current_user.id in Cart table 
     c = Cart.query.filter(Cart.cart_id==current_user.id).all()
     if not c:
-        flash('Your cart is empty!')
+        flash('سبد خرید شما خالی است')
     # get all the products
     p =[Products.query.filter(Products.id==i.product_id).first() for i in c]
     return render_template('cart.html', p=p, c=c, zip=zip)
@@ -375,7 +376,7 @@ def add_num(id):
                           Cart.cart_id==current_user.id).first()
     p = Products.query.filter(Products.id==id).first()
     if  p.inventory == 0:
-        flash('You picked up the last one - there is nothing left')
+        flash('موجودی این محصول به اتمام رسید')
         return redirect(url_for('show_cart', id=current_user.id))
     else:
         c.date = datetime.datetime.now()
