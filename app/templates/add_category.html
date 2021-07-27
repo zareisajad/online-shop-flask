@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block header %}Add New Category{% endblock %}
+{% block header %}ایجاد دسته بندی جدید{% endblock %}
 {% block content %}
 <div class="row align-items-center justify-content-center">
   <div class="col-md-4">
@@ -12,12 +12,12 @@
             {{ form.name(class_='add-form-fields')}}<br>
           </p>
         </div>
-        <button type="submit" class="btn btn-primary">Add Category</button>
+        <button type="submit" class="btn btn-primary">ذخیره</button>
       </form>
     </div>
   </div>
 </div><br>
-<h3>Categories:</h3> 
+<h3>دسته بندی ها:</h3> 
 {% for c in category %}
 <a href="{{url_for('category', id=c.id)}}" 
 class="btn btn-primary">{{ c.name }}</a>
