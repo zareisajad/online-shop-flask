@@ -12,65 +12,67 @@ def enabled_categories():
 
 
 class AddProductForm(FlaskForm):
-    photo = FileField('Photo:',validators=[FileRequired(),
+    photo = FileField('تصویر شاخص:',validators=[FileRequired(),
         FileAllowed(['jpg', 'png', 'gif', 'jpeg'], 'Images only!')])
-    title = StringField('Title:', validators=[DataRequired()])
-    price = StringField('Price:', validators=[DataRequired()])
-    discounted = StringField('Discunted Price:')
-    inventory = StringField('Inventory:', validators=[DataRequired()])
-    category = QuerySelectField('Category',
+    title = StringField('عنوان محصول:', validators=[DataRequired()])
+    short_desc = TextAreaField('توضیح کوتاه:', validators=[DataRequired()])
+    desc = TextAreaField('توضیحات:', validators=[DataRequired()])
+    price = StringField('قیمت:', validators=[DataRequired()])
+    discounted = StringField('قیمت تخفیف خورده:')
+    inventory = StringField('موجودی:', validators=[DataRequired()])
+    category = QuerySelectField('انتخاب دسته بندی:',
         query_factory=enabled_categories, allow_blank=True)
     photos = MultipleFileField(
-        'Add Gallery',validators=[FileAllowed(
+        'تصاویر گالری محصول:',validators=[FileAllowed(
         ['jpg', 'png', 'gif', 'jpeg'], 'Images only!')])
     submit = SubmitField('Publish')
 
 
 class AddCategoryForm(FlaskForm):
-    name = StringField('Category name', validators=[DataRequired()])
-    submit = SubmitField('Add Category')
+    name = StringField('نام دسته بندی', validators=[DataRequired()])
+    submit = SubmitField('ذخیره')
 
 
 class FilterProductsForm(FlaskForm):
-    keyword = StringField('Keyword:')
+    keyword = StringField('کلمه کلیدی:')
     category = QuerySelectField(
-        'Category:',query_factory=enabled_categories, allow_blank=True)
-    min_price = StringField('from:')
-    max_price = StringField('to')
+        'دسته بندی:',query_factory=enabled_categories, allow_blank=True)
+    min_price = StringField('از:')
+    max_price = StringField('تا')
     
 
 class RegisterationForm(FlaskForm):
     name = StringField(
-        'Name And Lastname:', validators=[DataRequired(
-        message='please enter your name')])
+        'نام:', validators=[DataRequired(
+        message='لطفا نام خود را وارد کنید')])
     email = StringField(
-        'Email:', validators=[DataRequired(message='please enter your email'),
-        Email(check_deliverability=True,message='email is not valid - try again')])
+        'ایمیل:', validators=[DataRequired(message='لطفا ایمیل خود را وارد کنید'),
+        Email(check_deliverability=True,message='ایمیل معتبر نیست')])
     password = PasswordField(
-        'Password:', validators=[DataRequired(message='Enter your password'),
-        Length(min=6,max=12,message='password must be 6 to 12 char')])
+        'رمز عبور:', validators=[DataRequired(message='رمز عبور خود را وارد کنید'),
+        Length(min=6,max=12,message='رمز عبور باید از ۶ تا ۱۲ کاراکتر طول داشته باشد')])
     
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
-            raise ValidationError('Email is already in use.')
+            raise ValidationError('این ایمیل قبلا استفاده شده است')
     
 
 class LoginForm(FlaskForm): 
     email = StringField(
-        'Email:', validators=[DataRequired(message='please enter your email'),
-        Email(check_deliverability=True,message='email is not valid - try again')])
+        'ایمیل:', validators=[DataRequired(message='لطفا ایمیل خود را وارد کنید'),
+        Email(check_deliverability=True,message='ایمیل معتبر نیست')])
     password = PasswordField(
-        'Password:', validators=[DataRequired(message='Enter your password'),
-        Length(min=6,max=12,message='password must be 6 to 12 char')])
+        'رمز عبور:', validators=[DataRequired(message='رمز عبور خود را وارد کنید'),
+        Length(min=6,max=12,message='رمز عبور باید از ۶ تا ۱۲ کاراکتر طول داشته باشد')])
     
     
 class CheckoutForm(FlaskForm):
-    name = StringField('Name and lastname:', validators=[DataRequired()])
-    country = StringField('country:', validators=[DataRequired()])
-    city =  StringField('city:', validators=[DataRequired()])
-    address =  TextField('Address:', validators=[DataRequired()])
-    phone =  StringField('Phone:', validators=[DataRequired()])
-    email = StringField('Email:', validators=[DataRequired()])
-    payment = RadioField('Label', choices=[('online'),('cash')])
+    name = StringField('نام و نام خانوادگی:', validators=[DataRequired()])
+    country = StringField('کشور:', validators=[DataRequired()])
+    city =  StringField('شهر:', validators=[DataRequired()])
+    address =  TextField('آدرس کامل:', validators=[DataRequired()])
+    phone =  StringField('شماره تماس:', validators=[DataRequired()])
+    email = StringField('ایمیل:', validators=[DataRequired()])
+    payment = RadioField('Label', choices=[('آنلاین'),('نقدی')])
     submit = SubmitField('ثبت شفارش')
