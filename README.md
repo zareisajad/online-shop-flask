@@ -1,8 +1,15 @@
 # ProductPurchase
-A simple product purchase app. user can add a product - [photo, title, price, discounted price, inventory ofand add some extra images for galley.]
-the app shows a products page that user can see products and can add it to cart or see its details.
-user also can manage [delete a product or see inventory and sold number] in another page that shows a list of all products.
-in cart page user can add or reduce number of a product or remove it.
+in this program you,
+as a user you can:
+- register and log in
+- add products to cart
+- filter products (most popular, most expensive, etc.)
+- order registration and payment
+
+and as a admin:
+- ability to create a new product (image, description, price, discounted price, inventory, etc.)
+- ability to manage products
+- access the order list and details of each order
 
 ## Used:
 - Python3
