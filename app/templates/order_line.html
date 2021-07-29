@@ -18,9 +18,9 @@
         <td>{{c.number}}</td>
         <td>
             {% if not p.discounted %}
-            {{'{0:,}'.format(p.price)}} تومان
+            {{'{0:,}'.format(p.price | int)}} تومان
             {% else %}
-            {{ '{0:,}'.format(p.discounted) }} تومان
+            {{ '{0:,}'.format(p.discounted | int) }} تومان
             {% endif %}  
         </td>
         <td>

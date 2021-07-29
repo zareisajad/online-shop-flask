@@ -3,8 +3,8 @@
 {% block content %}
 <!-- left column -->
 <div class="checkout-left-column-container" >
+    <h4 style="text-align: center;">سفارش شما</h4>
     {% for i,p in zip(p,c) %}
-   <h4 style="text-align: center;">سفارش شما</h4>
     <hr>
     <img src="{{i.photo}}" class="checkout-left-column-img">
     <span style="float: right;"><b>{{p.number}} عدد</b> {{i.title}} </span>
