@@ -1,15 +1,15 @@
 # ProductPurchase
 in this program you,
-As a user you can:
+as a user you can:
 - register and log in
-- Add products to cart
-- Filter products (most popular, most expensive, etc.)
-- Order registration and payment
+- add products to cart
+- filter products (most popular, most expensive, etc.)
+- order registration and payment
 
 and as a admin:
-- Ability to create a new product (image, description, price, discounted price, inventory, etc.)
-- Ability to manage products
-- Access the order list and details of each order
+- ability to create a new product (image, description, price, discounted price, inventory, etc.)
+- ability to manage products
+- access the order list and details of each order
 
 ## Used:
 - Python3
