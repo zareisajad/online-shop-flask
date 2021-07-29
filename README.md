@@ -5,6 +5,7 @@ As a user you can:
 - Add products to cart
 - Filter products (most popular, most expensive, etc.)
 - Order registration and payment
+
 and as a admin:
 - Ability to create a new product (image, description, price, discounted price, inventory, etc.)
 - Ability to manage products
