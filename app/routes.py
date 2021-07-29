@@ -19,10 +19,8 @@ def register():
         return redirect(url_for('products'))
     form = RegisterationForm()
     if form.validate_on_submit():
-        user = User(
-            name=form.name.data,
-            email=form.email.data
-            )
+        user = User(name=form.name.data,
+                    email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -242,7 +240,7 @@ def orders():
     o = Orders.query.filter(Orders.orders_id==User.id).order_by(Orders.orders_id).all()
     u = [User.query.filter(User.id==i.orders_id).first() for i in o]
     c = [Cart.query.filter(Cart.cart_id==i.id).first() for i in u]
-    if not o:
+    if not o :
         flash('سفارشی ثبت نشده است')
     return render_template(
         'orders.html', orders=o, user=u, cart=c ,zip=zip)
