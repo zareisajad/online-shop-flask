@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block header %}Orders List{% endblock %}
+{% block header %}لیست سفارشات{% endblock %}
 {% block content %}
 <table >
     <tr>      
@@ -9,13 +9,13 @@
         <th>آخرین به روزرسانی</th>
         <th>جمع کل</th>
     </tr>
-    {% for i,a,c in zip(user,orders,cart) %}
+    {% for i,o in zip(user,orders) %}
     <tr>
-        <td><a href="{{ url_for('order_line', id=a.id) }}">{{i.name}}</a></td>
-        <td>{{a.status}}</td>
-        <td>{{a.date.strftime('%b.%d %H:%M')}}</td>
-        <td>{{c.date.strftime('%b.%d %H:%M')}}</td>
-        <td>{{ '{0:,}'.format(c.total) }} تومان</td>
+        <td><a href="{{ url_for('order_line', id=o.id) }}">{{i.name}}</a></td>
+        <td>{{o.status}}</td>
+        <td>{{o.date.strftime('%b.%d %H:%M')}}</td>
+        <td></td>
+        <td>{{'{0:,}'.format(o.total)}} تومان</td>
     </td>
     {% endfor %}
     </tr>
