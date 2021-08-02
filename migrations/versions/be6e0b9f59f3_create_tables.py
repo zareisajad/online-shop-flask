@@ -1,8 +1,8 @@
 """create tables
 
-Revision ID: d7180d9c2aeb
+Revision ID: be6e0b9f59f3
 Revises: 
-Create Date: 2021-07-22 16:23:43.694601
+Create Date: 2021-08-02 12:58:15.994543
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd7180d9c2aeb'
+revision = 'be6e0b9f59f3'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -54,6 +54,8 @@ def upgrade():
     sa.Column('address', sa.String(), nullable=True),
     sa.Column('phone', sa.String(), nullable=True),
     sa.Column('email', sa.String(), nullable=True),
+    sa.Column('total', sa.Integer(), nullable=True),
+    sa.Column('amount', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['orders_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -66,6 +68,8 @@ def upgrade():
     sa.Column('discounted', sa.Integer(), nullable=True),
     sa.Column('inventory', sa.Integer(), nullable=True),
     sa.Column('sold', sa.Integer(), nullable=True),
+    sa.Column('short_desc', sa.String(), nullable=True),
+    sa.Column('desc', sa.String(), nullable=True),
     sa.Column('rate', sa.Integer(), nullable=True),
     sa.Column('category_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['category_id'], ['category.id'], ),
