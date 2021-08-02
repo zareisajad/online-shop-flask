@@ -62,7 +62,7 @@ class Orders(db.Model):
     phone = db.Column(db.String)
     email = db.Column(db.String)
     total = db.Column(db.Integer)
-    amount = db.Column(db.String)
+    product_id = db.Column(db.String)
     number = db.Column(db.Integer)
 
 
