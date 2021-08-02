@@ -1,5 +1,5 @@
 # ProductPurchase
-in this program you,
+in this program,
 as a user you can:
 - register and log in
 - add products to cart
