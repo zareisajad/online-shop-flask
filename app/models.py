@@ -61,6 +61,11 @@ class Orders(db.Model):
     address = db.Column(db.String)
     phone = db.Column(db.String)
     email = db.Column(db.String)
+    total = db.Column(db.Integer)
+    amount = db.Column(db.String)
+    number = db.Column(db.Integer)
+
+
 
 
 class Category(db.Model):
