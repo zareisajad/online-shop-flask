@@ -1,5 +1,6 @@
 import os
 import datetime 
+import ast
 from datetime import timedelta
 import humanize
 from flask import render_template, flash, redirect, url_for, request
@@ -135,36 +136,31 @@ def filter():
 @app.route('/popular-filter', methods=['POST','GET'])
 def popular():
     keyword.sort(key=lambda i: i.rate, reverse=True)
-    return render_template(
-        'filter_resualt.html', keyword=keyword)
+    return render_template('filter_resualt.html', keyword=keyword)
 
 
 @app.route('/sold-filter', methods=['POST','GET'])
 def sold():
     keyword.sort(key=lambda i: i.sold, reverse=True)
-    return render_template(
-        'filter_resualt.html', keyword=keyword)
+    return render_template('filter_resualt.html', keyword=keyword)
 
 
 @app.route('/expensive_filter', methods=['POST','GET'])
 def expensive():
     keyword.sort(key=lambda i: i.price, reverse=True)
-    return render_template(
-        'filter_resualt.html', keyword=keyword)
+    return render_template('filter_resualt.html', keyword=keyword)
 
 
 @app.route('/cheapest-filter', methods=['POST','GET'])
 def cheapest():
     keyword.sort(key=lambda i: i.price)
-    return render_template(
-        'filter_resualt.html', keyword=keyword)
+    return render_template('filter_resualt.html', keyword=keyword)
 
 
 @app.route('/newst-filter', methods=['POST','GET'])
 def newst():
     keyword.sort(key=lambda i: i.date, reverse=True)
-    return render_template(
-        'filter_resualt.html', keyword=keyword)
+    return render_template('filter_resualt.html', keyword=keyword)
 
 
 @app.route('/popular', methods=['POST','GET'])
@@ -237,23 +233,24 @@ def product_detail(id):
 
 @app.route('/orders-list', methods=['POST','GET'])
 def orders():
-    o = Orders.query.filter(Orders.orders_id==User.id).order_by(Orders.orders_id).all()
+    o = Orders.query.filter(Orders.orders_id==User.id).all()
     u = [User.query.filter(User.id==i.orders_id).first() for i in o]
-    c = [Cart.query.filter(Cart.cart_id==i.id).first() for i in u]
     if not o :
         flash('سفارشی ثبت نشده است')
     return render_template(
-        'orders.html', orders=o, user=u, cart=c ,zip=zip)
+        'orders.html', orders=o, user=u, zip=zip)
 
 
 @app.route('/order<int:id>', methods=['POST','GET'])
 def order_line(id):
+    number = []
     o = Orders.query.filter(Orders.orders_id==id).first()
-    u = User.query.filter(User.id==id).all()
-    c = Cart.query.filter(Cart.cart_id==id).all()
-    p =[Products.query.filter(Products.id==i.product_id).first() for i in c]
+    # convert string list to a list - using ast
+    convert = ast.literal_eval(o.product_id)
+    number = ast.literal_eval(o.number)
+    p =[Products.query.filter(Products.id==i).first() for i in convert]
     return render_template(
-        'order_line.html',user=u, cart=c, product=p ,o=o, zip=zip)
+        'order_line.html', product=p , o=o, number=number, zip=zip)
 
 
 @app.route('/user-checkout', methods=['POST','GET'])
@@ -270,6 +267,7 @@ def checkout():
 def payment():
     form = CheckoutForm()
     o = Orders.query.filter(Orders.orders_id==current_user.id).first()
+    c = Cart.query.filter(Cart.cart_id==current_user.id).all()
     # extracting user info enetred in checkout form
     name = form.name.data
     country = form.country.data
@@ -278,10 +276,17 @@ def payment():
     phone = form.phone.data
     email = form.email.data
     if not o:
-        orders = Orders(status='در انتظار پرداخت', orders_id=current_user.id,
-                        payment_method='آنلاین', name=name, country=country,
-                        city=city, address=address, phone=phone, email=email)
+        orders = Orders(
+            status='در انتظار پرداخت', 
+            orders_id=current_user.id, total=c[-1].total, 
+            number=str([c[i].number for i in range(len(c))]),
+            product_id=str([c[i].product_id for i in range(len(c))]),
+            payment_method='آنلاین', name=name, country=country,
+            city=city, address=address, phone=phone, email=email)
         db.session.add(orders)
+        db.session.commit()
+        for i in c:
+            db.session.delete(i)
         db.session.commit()
     if form.payment.data == 'نقدی':
         orders = Orders.query.filter(Orders.orders_id==current_user.id).first()
@@ -298,7 +303,7 @@ def payment():
 @app.route('/payment-gateway/<name>', methods=['POST','GET'])
 @login_required
 def payment_gateway(name):
-    c = Cart.query.filter(Cart.cart_id==current_user.id).all()
+    o = Orders.query.filter(Orders.orders_id==current_user.id).first()
     if name == 'پرداخت':
         orders = Orders.query.filter(Orders.orders_id==current_user.id).first()
         orders.status = 'پرداخت شده'
@@ -311,7 +316,7 @@ def payment_gateway(name):
         flash('عملیات پرداخت کنسل شد')
         db.session.commit()
         return redirect(url_for('products'))
-    return render_template('gateway.html', c=c)
+    return render_template('gateway.html', o=o)
     
 
 @app.route('/cart/<int:id>', methods=['POST','GET'])
