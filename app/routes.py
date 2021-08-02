@@ -1,18 +1,16 @@
 import os
 import ast
-import datetime 
-import humanize
-from datetime import timedelta
+import datetime
 from flask import render_template, flash, redirect, url_for, request
+from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import desc, asc
 from werkzeug.utils import secure_filename
-from app import app, db 
+from werkzeug.urls import url_parse
+
+from app import app, db
 from app.models import Products, Cart, Gallery, Category, User, Orders
 from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm,\
                       RegisterationForm, LoginForm, CheckoutForm
-from flask_login import current_user, login_user, logout_user, login_required
-from werkzeug.urls import url_parse
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -33,14 +31,14 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('products'))   
+        return redirect(url_for('products'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None:
             flash('کاربری با ایمیل پیدا نشد')
             return redirect(url_for('login'))
-        elif user and not user.check_password(form.password.data):
+        if user and not user.check_password(form.password.data):
             flash('رمز عبور اشتباه است')
             return redirect(url_for('login'))
         login_user(user)
@@ -106,12 +104,6 @@ def add_category():
     category = Category.query.all()
     return render_template(
         'add_category.html', form=form, category=category)
-
-
-@app.route('/category/<int:id>', methods=['POST','GET'])
-def category(id):
-    pro = Products.query.filter_by(category_id=id).all()
-    return render_template('products_category.html', pro=pro)
 
 
 @app.route('/filter', methods=['POST','GET'])
@@ -195,10 +187,10 @@ def newst_filter():
 
 @app.route('/manage', methods=['POST','GET'])
 def manage_products():
-    products = Products.query.all()
+    all_products = Products.query.all()
     if not products:
         flash('محصولی موجود نیست')
-    return render_template('manage_products.html', products=products)
+    return render_template('manage_products.html', products=all_products)
 
 
 @app.route('/del/<int:id>', methods=['GET', 'POST'])
@@ -232,14 +224,14 @@ def product_detail(id):
 
 
 @app.route('/orders-list', methods=['POST','GET'])
-def orders():
+def orders_list():
     """
-    show all orders 
+    show all orders
     ---------------
     query the Orders table and find all the users that have any order.
-    """  
+    """
     orders = Orders.query.filter(Orders.orders_id==User.id).all()
-    users = [User.query.filter(User.id==i.orders_id).first() for i in o]
+    users = [User.query.filter(User.id==i.orders_id).first() for i in orders]
     if not orders :
         flash('سفارشی ثبت نشده است')
     return render_template('orders.html', orders=orders, users=users, zip=zip)
@@ -255,11 +247,11 @@ def order_line(id):
     First we return them from string to list.
     find products using our products id: img title and price will use.
     also show number in template.
-    """    
+    """
     order = Orders.query.filter(Orders.orders_id==id).first()
-    products_id = ast.literal_eval(o.product_id)
-    products_number = ast.literal_eval(o.number)
-    p =[Products.query.filter(Products.id==i).first() for i in convert]
+    products_id = ast.literal_eval(order.product_id)
+    products_number = ast.literal_eval(order.number)
+    p =[Products.query.filter(Products.id==i).first() for i in products_id]
     return render_template('order_line.html', number=products_number,
                            product=p, order=order, zip=zip)
 
@@ -288,8 +280,8 @@ def payment():
     email = form.email.data
     if not o:
         orders = Orders(
-            status='در انتظار پرداخت', 
-            orders_id=current_user.id, total=c[-1].total, 
+            status='در انتظار پرداخت',
+            orders_id=current_user.id, total=c[-1].total,
             number=str([c[i].number for i in range(len(c))]),
             product_id=str([c[i].product_id for i in range(len(c))]),
             payment_method='آنلاین', name=name, country=country,
@@ -305,7 +297,6 @@ def payment():
         orders.payment_method = 'نقدی'
         db.session.commit()
         return redirect(url_for('products'))
-        flash('سفارش با موفقیت ثبت شد')
     if o:
         flash('این سفارش قبلا ثبت شده است')
         return redirect(url_for('products'))
@@ -317,21 +308,20 @@ def payment():
 def payment_gateway(name):
     o = Orders.query.filter(Orders.orders_id==current_user.id).first()
     if name == 'پرداخت':
-        orders = Orders.query.filter(
-            Orders.orders_id==current_user.id).first()
-        orders.status = 'پرداخت شده'
+        order = Orders.query.filter(Orders.orders_id==current_user.id).first()
+        order.status = 'پرداخت شده'
         flash('پرداخت موفق')
         db.session.commit()
         return redirect(url_for('products'))
     if name == 'انصراف':
-        orders = Orders.query.filter(
+        order = Orders.query.filter(
             Orders.orders_id==current_user.id).first()
-        orders.status = 'کنسل شده'
+        order.status = 'کنسل شده'
         flash('عملیات پرداخت کنسل شد')
         db.session.commit()
         return redirect(url_for('products'))
     return render_template('gateway.html', o=o)
-    
+
 
 @app.route('/cart/<int:id>', methods=['POST','GET'])
 @login_required
@@ -351,7 +341,7 @@ def cart(id):
 
 @app.route('/user-<int:id>', methods=['POST','GET'])
 def show_cart(id):
-    # get all the items that matchs with current_user.id in Cart table 
+    # get all the items that matchs with current_user.id in Cart table
     c = Cart.query.filter(Cart.cart_id==current_user.id).all()
     if not c:
         flash('سبد خرید شما خالی است')
@@ -395,11 +385,10 @@ def add_num(id):
     if  p.inventory == 0:
         flash('موجودی این محصول به اتمام رسید')
         return redirect(url_for('show_cart', id=current_user.id))
-    else:
-        c.date = datetime.datetime.now()
-        c.number += 1
-        p.inventory -= 1
-        db.session.commit()
+    c.date = datetime.datetime.now()
+    c.number += 1
+    p.inventory -= 1
+    db.session.commit()
     return redirect(url_for('show_cart', id=current_user.id))
 
 
