@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block header %}Orders details{% endblock %}
+{% block header %}جزئیات سفارش{% endblock %}
 {% block content %}
 <table >
     <tr>      
@@ -8,36 +8,36 @@
         <th>قیمت</th>
         <th>جمع قیمت</th>
     </tr>
-    {% set total = [] %}
-    {% for p,c in zip(product,cart) %}   
+    {% for p,i in zip(product, number) %} 
     <tr>
         <td style="text-align: right;">
             <img class="card-img-top" src="{{p.photo}}" style="width: 40px; height: 40px;"> 
             {{p.title}}
         </td>
-        <td>{{c.number}}</td>
         <td>
-            {% if not p.discounted %}
-            {{'{0:,}'.format(p.price | int)}} تومان
-            {% else %}
-            {{ '{0:,}'.format(p.discounted | int) }} تومان
-            {% endif %}  
+        {{i}} عدد
         </td>
         <td>
-            {% if not p.discounted %}
-            {% set amount =  c.number * p.price %}
+            {% if p.discounted %}
+            {{'{0:,}'.format(p.discounted)}} تومان
             {% else %}
-            {% set amount =  c.number * p.discounted %}      
-            {% endif %}  
-            {{'{0:,}'.format(c.amount)}} تومان
+            {{ '{0:,}'.format(p.price)}} jتومان
+            {% endif %}
+        </td>
+        <td>
+            {% if p.discounted %}
+            {% set total = i * p.discounted %}
+            {% else %}
+            {% set total = i * p.price %}
+            {% endif %}
+            {{'{0:,}'.format(total)}} تومان
         </td>
     </td>
-    {% set _ = total.append(amount) %}
     {% endfor %}
 </tr>
 </table>
 <div class="user-info" dir="rtl">
-    <a style="float: left;"><b>مبلغ کل : {{ '{0:,}'.format(total | sum())}} تومان</b></a>
+    <a style="float: left;"><b>مبلغ کل :{{'{0:,}'.format(o.total)}} تومان </b></a>
 <br>
 <hr>
 <p>
@@ -50,11 +50,9 @@
     </p>
     <p>
         <b>تاریخ ثبت پرداخت:</b>
-        {{o.date.strftime('%b.%d %H:%M')}}
    </p>
    <p>
     <b>تاریخ تکمیل پرداخت:</b>
-    {{o.date.strftime('%b.%d %H:%M')}}
     </p>
     <hr>
        <p>نام و نام خانوادگی: {{o.name}}</p>
