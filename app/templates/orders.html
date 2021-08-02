@@ -9,7 +9,7 @@
         <th>آخرین به روزرسانی</th>
         <th>جمع کل</th>
     </tr>
-    {% for i,o in zip(user,orders) %}
+    {% for i,o in zip(users,orders) %}
     <tr>
         <td><a href="{{ url_for('order_line', id=o.id) }}">{{i.name}}</a></td>
         <td>{{o.status}}</td>
