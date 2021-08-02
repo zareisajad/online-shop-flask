@@ -233,24 +233,35 @@ def product_detail(id):
 
 @app.route('/orders-list', methods=['POST','GET'])
 def orders():
-    o = Orders.query.filter(Orders.orders_id==User.id).all()
-    u = [User.query.filter(User.id==i.orders_id).first() for i in o]
-    if not o :
+    """
+    show all orders 
+    ---------------
+    query the Orders table and find all the users that have any order.
+    """  
+    orders = Orders.query.filter(Orders.orders_id==User.id).all()
+    users = [User.query.filter(User.id==i.orders_id).first() for i in o]
+    if not orders :
         flash('سفارشی ثبت نشده است')
-    return render_template(
-        'orders.html', orders=o, user=u, zip=zip)
+    return render_template('orders.html', orders=orders, users=users, zip=zip)
 
 
 @app.route('/order<int:id>', methods=['POST','GET'])
 def order_line(id):
-    number = []
-    o = Orders.query.filter(Orders.orders_id==id).first()
-    # convert string list to a list - using ast
-    convert = ast.literal_eval(o.product_id)
-    number = ast.literal_eval(o.number)
+    """
+    show each order details
+    ------------------------
+    we receive the list of product ID and product's number
+    (the number selected by user in the cart ) as a list.
+    First we return them from string to list.
+    find products using our products id: img title and price will use.
+    also show number in template.
+    """    
+    order = Orders.query.filter(Orders.orders_id==id).first()
+    products_id = ast.literal_eval(o.product_id)
+    products_number = ast.literal_eval(o.number)
     p =[Products.query.filter(Products.id==i).first() for i in convert]
-    return render_template(
-        'order_line.html', product=p , o=o, number=number, zip=zip)
+    return render_template('order_line.html', number=products_number,
+                           product=p, order=order, zip=zip)
 
 
 @app.route('/user-checkout', methods=['POST','GET'])
@@ -289,7 +300,8 @@ def payment():
             db.session.delete(i)
         db.session.commit()
     if form.payment.data == 'نقدی':
-        orders = Orders.query.filter(Orders.orders_id==current_user.id).first()
+        orders = Orders.query.filter(
+            Orders.orders_id==current_user.id).first()
         orders.payment_method = 'نقدی'
         db.session.commit()
         return redirect(url_for('products'))
@@ -305,13 +317,15 @@ def payment():
 def payment_gateway(name):
     o = Orders.query.filter(Orders.orders_id==current_user.id).first()
     if name == 'پرداخت':
-        orders = Orders.query.filter(Orders.orders_id==current_user.id).first()
+        orders = Orders.query.filter(
+            Orders.orders_id==current_user.id).first()
         orders.status = 'پرداخت شده'
         flash('پرداخت موفق')
         db.session.commit()
         return redirect(url_for('products'))
     if name == 'انصراف':
-        orders = Orders.query.filter(Orders.orders_id==current_user.id).first()
+        orders = Orders.query.filter(
+            Orders.orders_id==current_user.id).first()
         orders.status = 'کنسل شده'
         flash('عملیات پرداخت کنسل شد')
         db.session.commit()
@@ -322,8 +336,8 @@ def payment_gateway(name):
 @app.route('/cart/<int:id>', methods=['POST','GET'])
 @login_required
 def cart(id):
-    ca = Cart.query.filter(Cart.product_id==id, 
-                           Cart.cart_id==current_user.id).first()
+    ca = Cart.query.filter(
+        Cart.product_id==id, Cart.cart_id==current_user.id).first()
     if ca:
         flash('این محصول قبلا اضافه شده است')
     else:
