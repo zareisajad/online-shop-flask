@@ -37,16 +37,16 @@
 </tr>
 </table>
 <div class="user-info" dir="rtl">
-    <a style="float: left;"><b>مبلغ کل :{{'{0:,}'.format(o.total)}} تومان </b></a>
+    <a style="float: left;"><b>مبلغ کل :{{'{0:,}'.format(order.total)}} تومان </b></a>
 <br>
 <hr>
 <p>
        <b>روش پرداخت :</b>
-       {{o.payment_method}}
+       {{order.payment_method}}
    </p>
    <p>
        <b>وضعیت پرداخت :</b>
-       {{o.status}}
+       {{order.status}}
     </p>
     <p>
         <b>تاریخ ثبت پرداخت:</b>
@@ -56,11 +56,11 @@
     </p>
     <hr>
        <p>نام و نام خانوادگی: {{o.name}}</p>
-       <p>کشور : {{o.country}}</p>
-       <p>شهر : {{o.city}}</p>
-       <p>آدرس : {{o.address}}</p>
-       <p>تلفن: {{o.phone}}</p>
-       <p>ایمیل: {{o.email}}</p>
+       <p>کشور : {{order.country}}</p>
+       <p>شهر : {{order.city}}</p>
+       <p>آدرس : {{order.address}}</p>
+       <p>تلفن: {{order.phone}}</p>
+       <p>ایمیل: {{order.email}}</p>
 </div>
 <br>
 {% endblock %}
