@@ -4,7 +4,7 @@
 {% block content %}
 <div style="text-align: center;">
     مبلغ قابل پرداخت :‌
-    {{c[-1].total}}
+    {{o.total}}
     <a href="{{url_for('payment_gateway', name='پرداخت')}}" class="btn btn-primary" >پرداخت</a>
     <a href="{{url_for('payment_gateway', name='انصراف')}}" class="btn btn-primary" >انصراف</a>
 </div>
