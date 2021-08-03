@@ -19,7 +19,6 @@
 </div><br>
 <h3>دسته بندی ها:</h3> 
 {% for c in category %}
-<a href="{{url_for('category', id=c.id)}}" 
-class="btn btn-primary">{{ c.name }}</a>
+<a class="btn btn-primary">{{ c.name }}</a>
 {% endfor %}
 {% endblock %}
