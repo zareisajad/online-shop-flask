@@ -1,10 +1,10 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, MultipleFileField, PasswordField,\
-                    TextField, IntegerField, RadioField
+from wtforms import StringField, SubmitField, MultipleFileField,\
+                    PasswordField, TextField, RadioField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Length, Email, ValidationError
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from flask_wtf import FlaskForm
 from app.models import Category, User
 
 
@@ -40,7 +40,7 @@ class FilterProductsForm(FlaskForm):
         'دسته بندی:',query_factory=enabled_categories, allow_blank=True)
     min_price = StringField('از:')
     max_price = StringField('تا')
-    
+
 
 class RegisterationForm(FlaskForm):
     name = StringField(
@@ -52,22 +52,22 @@ class RegisterationForm(FlaskForm):
     password = PasswordField(
         'رمز عبور:', validators=[DataRequired(message='رمز عبور خود را وارد کنید'),
         Length(min=6,max=12,message='رمز عبور باید از ۶ تا ۱۲ کاراکتر طول داشته باشد')])
-    
+
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('این ایمیل قبلا استفاده شده است')
-    
 
-class LoginForm(FlaskForm): 
+
+class LoginForm(FlaskForm):
     email = StringField(
         'ایمیل:', validators=[DataRequired(message='لطفا ایمیل خود را وارد کنید'),
         Email(check_deliverability=True,message='ایمیل معتبر نیست')])
     password = PasswordField(
         'رمز عبور:', validators=[DataRequired(message='رمز عبور خود را وارد کنید'),
-        Length(min=6,max=12,message='رمز عبور باید از ۶ تا ۱۲ کاراکتر طول داشته باشد')])
-    
-    
+        Length(min=6, max=12, message='رمز عبور باید از ۶ تا ۱۲ کاراکتر طول داشته باشد')])
+
+
 class CheckoutForm(FlaskForm):
     name = StringField('نام و نام خانوادگی:', validators=[DataRequired()])
     country = StringField('کشور:', validators=[DataRequired()])
