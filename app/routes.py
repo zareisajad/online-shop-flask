@@ -82,9 +82,9 @@ def logout():
 @app.route('/')
 def main_page():
     """
-    Main Page
+    Main Page | products
     ---------
-    this page contains all the main_page cards.
+    this page contains all the products cards.
     if there is no products then we flash a message.
     """
     all_products = Products.query.all()
@@ -229,7 +229,7 @@ def manage_products():
     ---------------
     """
     all_products = Products.query.all()
-    if not products:
+    if not all_products:
         flash('محصولی موجود نیست')
     return render_template('manage_products.html', products=all_products)
 
@@ -314,8 +314,8 @@ def checkout():
     ---------------
     """
     form = CheckoutForm()
-    c = Cart.query.filter(Cart.cart_id==current_user.id).all()
-    p =[Products.query.filter(Products.id==i.product_id).first() for i in c]
+    c = current_user.cart
+    p = [Products.query.filter(Products.id==i.product_id).first() for i in c]
     return render_template('checkout.html', c=c, p=p, form=form, zip=zip)
 
 
@@ -328,7 +328,7 @@ def payment():
     """
     form = CheckoutForm()
     o = Orders.query.filter(Orders.orders_id==current_user.id).first()
-    c = Cart.query.filter(Cart.cart_id==current_user.id).all()
+    c = current_user.cart
     # extracting user info enetred in checkout form
     name = form.name.data
     country = form.country.data
@@ -411,13 +411,11 @@ def show_cart(id):
     User Cart
     ---------------
     """
-    # get all the items that matchs with current_user.id in Cart table
-    c = Cart.query.filter(Cart.cart_id==current_user.id).all()
-    if not c:
+    user_cart = current_user.cart
+    if not user_cart:
         flash('سبد خرید شما خالی است')
-    # get all the products
-    p =[Products.query.filter(Products.id==i.product_id).first() for i in c]
-    return render_template('cart.html', p=p, c=c, zip=zip)
+    cart_products =[Products.query.filter(Products.id==i.product_id).first() for i in current_user.cart]
+    return render_template('cart.html', cart_products=cart_products, user_cart=user_cart, zip=zip)
 
 
 @app.route('/del/cart/<int:id>', methods=['GET', 'POST'])
@@ -439,7 +437,7 @@ def final_amount():
     Calculate Final Amount
     ---------------
     """
-    c = Cart.query.filter(Cart.cart_id==current_user.id).all()
+    c = current_user.cart
     p = [Products.query.filter(Products.id==i.product_id).first() for i in c]
     total = []
     for a, i in zip(c, p):
