@@ -4,9 +4,8 @@
 <table >
     <tr>      
         <th>سفارش</th>
-        <th>وضعیت پرداخت</th>
+        <th>وضعیت</th>
         <th>تاریخ ایجاد سفارش</th>
-        <th>آخرین به روزرسانی</th>
         <th>جمع کل</th>
     </tr>
     {% for i,o in zip(users,orders) %}
@@ -14,7 +13,6 @@
         <td><a href="{{ url_for('order_line', id=o.id) }}">{{i.name}}</a></td>
         <td>{{o.status}}</td>
         <td>{{o.date.strftime('%b.%d %H:%M')}}</td>
-        <td></td>
         <td>{{'{0:,}'.format(o.total)}} تومان</td>
     </td>
     {% endfor %}
