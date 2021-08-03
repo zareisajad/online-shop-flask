@@ -120,13 +120,13 @@ border:1px solid #66a3c4;
 }
 /* Columns */
 .left-column {
-  width: 50%;
+  width: 40%;
   position: relative;
   padding: 15px;
   margin-top: 15px;
 }
 .right-column {
-  width: 50%;
+  width: 60%;
   margin-top: 30px;
 }
 /* Product Description */
