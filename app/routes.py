@@ -335,7 +335,7 @@ def order_line(id):
     find products using our products id: img title and price will use.
     also show number in template.
     """
-    order = Orders.query.filter(Orders.orders_id == id).first()
+    order = Orders.query.filter(Orders.orders_id == id+1).first()
     products_id = ast.literal_eval(order.product_id)
     products_number = ast.literal_eval(order.number)
     p = [Products.query.filter(Products.id == i).first() for i in products_id]
