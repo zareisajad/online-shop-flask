@@ -1,6 +1,4 @@
-"""
-Flask application factory
-"""
+"""Flask application factory"""
 
 from flask import Flask
 from config import Config
@@ -15,6 +13,5 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
 login.login_message = 'ابتدا وارد حساب کاربری شوید'
-
 
 from app import app, routes
