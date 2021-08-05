@@ -27,4 +27,4 @@ and as a admin:
 
 
 ## TO DO:
-- [ ] add user admin 
+- [x] add user admin 
