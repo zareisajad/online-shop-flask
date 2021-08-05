@@ -7,11 +7,37 @@ from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import desc, asc
 from werkzeug.utils import secure_filename
 from werkzeug.urls import url_parse
+from flask_user import roles_required, UserManager
 
 from app import app, db
-from app.models import Products, Cart, Gallery, Category, User, Orders
+from app.models import Products, Cart, Gallery, Category, User, Orders, Role
 from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm,\
                       RegisterationForm, LoginForm, CheckoutForm
+
+# executes before any tasks
+@app.before_first_request
+def create_admin():
+    """
+    Create Admin User
+    -----------------
+    we using flask-user ( @roles_required ) to handle admin's access.
+    first before app executes any task - for this point
+    @app.before_first_request used - we create admin.
+    then pass the role "Admin" to the user - for each route that is available
+    only for admin; with @roles_required('Admin') decorator,
+    the user's role  will be check.
+    """
+    user_manager = UserManager(app, db, User)
+    if not User.query.filter(User.email == 'admin@example.com').first():
+        user = User(
+                name='admin',
+                email='admin@example.com',
+                email_confirmed_at=datetime.datetime.utcnow(),
+                password=user_manager.hash_password('Password1'),
+                )
+        user.roles.append(Role(name='Admin'))
+        db.session.add(user)
+        db.session.commit()
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -41,7 +67,7 @@ def register():
 def login():
     """
     Login User
-    -------------
+    ----------
     first if user is already logged in, we redirect them to main page
     after extract email and password from login form;
     we check if the email is in db or not, otherwise app flashs a message
@@ -71,7 +97,7 @@ def login():
 def logout():
     """
     Logging Out
-    ---------------
+    -----------
     we call logout_user() from flask login
     redirect user to the main page, and that's it.
     """
@@ -79,11 +105,17 @@ def logout():
     return redirect(url_for('main_page'))
 
 
+@app.route('/admin')
+@roles_required('Admin')
+def admin_page():
+    return redirect(url_for('main_page'))
+
+
 @app.route('/')
 def main_page():
     """
     Main Page | products
-    ---------
+    --------------------
     this page contains all the products cards.
     if there is no products then we flash a message.
     """
@@ -94,6 +126,7 @@ def main_page():
 
 
 @app.route('/add-product', methods=['POST', 'GET'])
+@roles_required('Admin')
 def add_product():
     """
     Add New Product
@@ -126,10 +159,11 @@ def add_product():
 
 
 @app.route('/add-category', methods=['POST', 'GET'])
+@roles_required('Admin')
 def add_category():
     """
     Add New Category
-    ---------------
+    ----------------
     """
     form = AddCategoryForm()
     if form.validate_on_submit():
@@ -223,10 +257,11 @@ def newst_filter():
 
 
 @app.route('/manage', methods=['POST', 'GET'])
+@roles_required('Admin')
 def manage_products():
     """
     Manage Products Page
-    ---------------
+    --------------------
     """
     all_products = Products.query.all()
     if not all_products:
@@ -273,6 +308,7 @@ def product_detail(id):
 
 
 @app.route('/orders-list', methods=['POST','GET'])
+@roles_required('Admin')
 def orders_list():
     """
     show all orders
@@ -288,6 +324,7 @@ def orders_list():
 
 
 @app.route('/order<int:id>', methods=['POST','GET'])
+@roles_required('Admin')
 def order_line(id):
     """
     show each order details
@@ -311,11 +348,13 @@ def order_line(id):
 def checkout():
     """
     Checkout Page
-    ---------------
+    -------------
     """
     form = CheckoutForm()
     c = current_user.cart
-    p = [Products.query.filter(Products.id == i.product_id).first() for i in c]
+    p = [
+        Products.query.filter(
+        Products.id == i.product_id).first() for i in c]
     return render_template('checkout.html', c=c, p=p, form=form, zip=zip)
 
 
@@ -324,7 +363,7 @@ def checkout():
 def payment():
     """
     Payment Page
-    ---------------
+    ------------
     """
     form = CheckoutForm()
     o = Orders.query.filter(Orders.orders_id==current_user.id).first()
@@ -366,7 +405,7 @@ def payment():
 def payment_gateway(name):
     """
     Fake Payment Gateway. *Temporary*
-    ---------------
+    ---------------------------------
     """
     o = Orders.query.filter(Orders.orders_id==current_user.id).first()
     if name == 'پرداخت':
@@ -390,10 +429,10 @@ def payment_gateway(name):
 def cart(id):
     """
     Add Products To Cart
-    ---------------
+    --------------------
     """
     ca = Cart.query.filter(
-        Cart.product_id==id, Cart.cart_id==current_user.id).first()
+         Cart.product_id==id, Cart.cart_id==current_user.id).first()
     if ca:
         flash('این محصول قبلا اضافه شده است')
     else:
@@ -409,20 +448,24 @@ def cart(id):
 def show_cart(id):
     """
     User Cart
-    ---------------
+    ---------
     """
     user_cart = current_user.cart
     if not user_cart:
         flash('سبد خرید شما خالی است')
-    cart_products =[Products.query.filter(Products.id==i.product_id).first() for i in current_user.cart]
-    return render_template('cart.html', cart_products=cart_products, user_cart=user_cart, zip=zip)
+    cart_products =[
+        Products.query.filter(Products.id==i.product_id).first()
+        for i in current_user.cart
+    ]
+    return render_template(
+        'cart.html',cart_products=cart_products, user_cart=user_cart, zip=zip)
 
 
 @app.route('/del/cart/<int:id>', methods=['GET', 'POST'])
 def delete_cart(id):
     """
     Remove Items From Cart
-    ---------------
+    ----------------------
     """
     c = Cart.query.filter(Cart.cart_id==current_user.id,
                           Cart.product_id==id).first()
@@ -435,7 +478,7 @@ def delete_cart(id):
 def final_amount():
     """
     Calculate Final Amount
-    ---------------
+    ----------------------
     """
     c = current_user.cart
     p = [Products.query.filter(Products.id==i.product_id).first() for i in c]
@@ -457,7 +500,7 @@ def final_amount():
 def add_num(id):
     """
     Add Product Number In Cart
-    ---------------
+    --------------------------
     """
     c = Cart.query.filter(Cart.product_id==id,
                           Cart.cart_id==current_user.id).first()
