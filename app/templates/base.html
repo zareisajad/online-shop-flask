@@ -18,10 +18,11 @@
       <li class="nav-item">
         {% if current_user.is_authenticated %}
         <a class="nav-link" href="{{ url_for('show_cart', id=current_user.id)}}">سبد خرید</a>
-        {% endif %}
       </li>
+      {% endif %}
       <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('add_product') }}">محصول جدید</a> 
+        {% if current_user.name == 'admin' %}
+        <a class="nav-link" href="{{ url_for('add_product') }}">محصول جدید</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{{ url_for('manage_products') }}">مدیریت محصولات</a>
@@ -30,6 +31,7 @@
         <a class="nav-link" href="{{ url_for('orders_list') }}">سفارشات</a>
       </li>
     </ul>
+    {% endif %}
   </div>
   {% if current_user.is_authenticated %}
     <a  class="btn btn-primary" href="{{ url_for('logout') }}">خروج</a>
