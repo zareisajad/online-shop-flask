@@ -21,7 +21,7 @@
       </li>
       {% endif %}
       <li class="nav-item">
-        {% if current_user.name == 'admin' %}
+        {% if current_user.role == 'Admin' %}
         <a class="nav-link" href="{{ url_for('add_product') }}">محصول جدید</a>
       </li>
       <li class="nav-item">
