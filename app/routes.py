@@ -7,12 +7,26 @@ from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import desc, asc
 from werkzeug.utils import secure_filename
 from werkzeug.urls import url_parse
-from flask_user import roles_required, UserManager
+from functools import wraps
 
 from app import app, db
-from app.models import Products, Cart, Gallery, Category, User, Orders, Role
+from app.models import Products, Cart, Gallery, Category, User, Orders
 from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm,\
                       RegisterationForm, LoginForm, CheckoutForm
+
+
+def login_required_role(role="ANY"):
+    def wrapper(fn):
+        @wraps(fn)
+        def decorated_view(*args, **kwargs):
+            if not current_user.is_authenticated:
+              return login.unauthorized()
+            if ((current_user.role != role) and (role != "ANY")):
+                return login.unauthorized()
+            return fn(*args, **kwargs)
+        return decorated_view
+    return wrapper
+
 
 # executes before any tasks
 @app.before_first_request
@@ -20,24 +34,13 @@ def create_admin():
     """
     Create Admin User
     -----------------
-    we using flask-user ( @roles_required ) to handle admin's access.
-    first before app executes any task - for this point
-    @app.before_first_request used - we create admin.
-    then pass the role "Admin" to the user - for each route that is available
-    only for admin; with @roles_required('Admin') decorator,
-    the user's role  will be check.
+    first before app executes any task - we create admin.
+    and pass "Admin" to the user.
     """
-    user_manager = UserManager(app, db, User)
-    if not User.query.filter(User.email == 'admin@example.com').first():
-        user = User(
-                name='admin',
-                email='admin@example.com',
-                email_confirmed_at=datetime.datetime.utcnow(),
-                password=user_manager.hash_password('Password1'),
-                )
-        user.roles.append(Role(name='Admin'))
-        db.session.add(user)
-        db.session.commit()
+    user = User(name='admin', email='admin@example.com', role='Admin')
+    user.set_password('Password1')
+    db.session.add(user)
+    db.session.commit()
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -54,7 +57,7 @@ def register():
         return redirect(url_for('main_page'))
     form = RegisterationForm()
     if form.validate_on_submit():
-        user = User(name=form.name.data, email=form.email.data)
+        user = User(name=form.name.data, email=form.email.data, role='user')
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -105,12 +108,6 @@ def logout():
     return redirect(url_for('main_page'))
 
 
-@app.route('/admin')
-@roles_required('Admin')
-def admin_page():
-    return redirect(url_for('main_page'))
-
-
 @app.route('/')
 def main_page():
     """
@@ -126,7 +123,7 @@ def main_page():
 
 
 @app.route('/add-product', methods=['POST', 'GET'])
-@roles_required('Admin')
+@login_required_role(role="Admin")
 def add_product():
     """
     Add New Product
@@ -159,7 +156,7 @@ def add_product():
 
 
 @app.route('/add-category', methods=['POST', 'GET'])
-@roles_required('Admin')
+@login_required_role(role="Admin")
 def add_category():
     """
     Add New Category
@@ -257,7 +254,7 @@ def newst_filter():
 
 
 @app.route('/manage', methods=['POST', 'GET'])
-@roles_required('Admin')
+@login_required_role(role="Admin")
 def manage_products():
     """
     Manage Products Page
@@ -270,6 +267,7 @@ def manage_products():
 
 
 @app.route('/del/<int:id>', methods=['GET', 'POST'])
+@login_required_role(role="Admin")
 def delete(id):
     """
     Delete Products
@@ -308,7 +306,7 @@ def product_detail(id):
 
 
 @app.route('/orders-list', methods=['POST','GET'])
-@roles_required('Admin')
+@login_required_role(role="Admin")
 def orders_list():
     """
     show all orders
@@ -324,7 +322,7 @@ def orders_list():
 
 
 @app.route('/order<int:id>', methods=['POST','GET'])
-@roles_required('Admin')
+@login_required_role(role="Admin")
 def order_line(id):
     """
     show each order details
@@ -445,6 +443,7 @@ def cart(id):
 
 
 @app.route('/user-<int:id>', methods=['POST','GET'])
+@login_required
 def show_cart(id):
     """
     User Cart
