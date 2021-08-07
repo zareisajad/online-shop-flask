@@ -37,10 +37,11 @@ def create_admin():
     first before app executes any task - we create admin.
     and pass "Admin" to the user.
     """
-    user = User(name='admin', email='admin@example.com', role='Admin')
-    user.set_password('Password1')
-    db.session.add(user)
-    db.session.commit()
+    if not User.query.filter_by(email='admin@example.com').first():        
+        user = User(name='admin', email='admin@example.com', role='Admin')
+        user.set_password('Password1')
+        db.session.add(user)
+        db.session.commit()
 
 
 @app.route('/register', methods=['GET', 'POST'])
