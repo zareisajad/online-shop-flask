@@ -24,6 +24,9 @@ and as a admin:
 - from the project folder, install packages using ``` pip install -r requirements.txt ```
 - for database migrations use : ``` flask db upgrade ```
 - finally ``` flask run ```
+
 **To login as admin user:**
-Email : admin@example.com
-Password : Password1
+
+Email : ```admin@example.com```
+
+Password : ```Password1```
