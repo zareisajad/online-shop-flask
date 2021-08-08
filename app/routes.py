@@ -1,13 +1,13 @@
 import os
 import ast
 import datetime
+from functools import wraps
 
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import desc, asc
 from werkzeug.utils import secure_filename
 from werkzeug.urls import url_parse
-from functools import wraps
 
 from app import app, db
 from app.models import Products, Cart, Gallery, Category, User, Orders
@@ -34,8 +34,8 @@ def create_admin():
     """
     Create Admin User
     -----------------
-    first before app executes any task - we create admin.
-    and pass "Admin" to the user.
+    first before app executes any task
+    we create a user and pass 'Admin' to User.role.
     """
     if not User.query.filter_by(email='admin@example.com').first():
         user = User(name='admin', email='admin@example.com', role='Admin')
@@ -236,9 +236,12 @@ def cart(id):
         c = Cart(product_id=id, number=1, amount=0,
                  total=0, cart_id=current_user.id)
         db.session.add(c)
+        p = Products.query.filter(Products.id==id).first()
+        p.sold += 1
+        p.inventory -= 1
         flash('به سبد خرید اضافه شد')
     db.session.commit()
-    return redirect(url_for('show_cart', id=current_user.id))
+    return redirect(url_for('main_page'))
 
 
 @app.route('/user-<int:id>', methods=['POST','GET'])
@@ -267,6 +270,9 @@ def delete_cart(id):
     """
     c = Cart.query.filter(Cart.cart_id==current_user.id,
                           Cart.product_id==id).first()
+    p = Products.query.filter(Products.id==id).first()
+    p.sold -= c.number
+    p.inventory += c.number
     db.session.delete(c)
     db.session.commit()
     return redirect(url_for('show_cart', id=current_user.id))
@@ -281,14 +287,13 @@ def add_num(id):
     c = Cart.query.filter(Cart.product_id==id,
                           Cart.cart_id==current_user.id).first()
     p = Products.query.filter(Products.id==id).first()
-    if p.inventory == 0:
-        flash('موجودی این محصول به اتمام رسید')
+    while c.number < p.inventory:
+        c.number += 1
+        db.session.commit()
         return redirect(url_for('show_cart', id=current_user.id))
-    c.date = datetime.datetime.now()
-    c.number += 1
-    p.inventory -= 1
-    db.session.commit()
-    return redirect(url_for('show_cart', id=current_user.id))
+    else:
+        flash('بیشتر از این تعداد موجود نیست')
+        return redirect(url_for('show_cart', id=current_user.id))
 
 
 @app.route('/c/reduce/<int:id>', methods=['POST','GET'])
@@ -299,14 +304,9 @@ def reduce_num(id):
     """
     c = Cart.query.filter(Cart.product_id==id,
                           Cart.cart_id==current_user.id).first()
-    p = Products.query.filter(Products.id==id).first()
     if c.number != 0:
-        c.date = datetime.datetime.now()
         c.number -= 1
-        p.inventory += 1
         db.session.commit()
-    else:
-        return redirect(url_for('show_cart',id=current_user.id))
     return redirect(url_for('show_cart',id=current_user.id))
 
 
@@ -332,9 +332,14 @@ def payment():
     Payment Page
     ------------
     """
+    c = current_user.cart
+    for i in range(len(c)):
+        # reduce product inventory
+        Products.query.filter(Products.id==c[i].product_id).first().inventory -= c[i].number - 1
+        # add product sold number
+        Products.query.filter(Products.id==c[i].product_id).first().sold += c[i].number - 1
     form = CheckoutForm()
     o = Orders.query.filter(Orders.orders_id==current_user.id).first()
-    c = current_user.cart
     # extracting user info enetred in checkout form
     name = form.name.data
     country = form.country.data
@@ -360,6 +365,7 @@ def payment():
             Orders.orders_id==current_user.id).first()
         orders.payment_method = 'نقدی'
         db.session.commit()
+        flash('پرداخت موفق')
         return redirect(url_for('main_page'))
     if o:
         flash('این سفارش قبلا ثبت شده است')
@@ -419,7 +425,7 @@ def order_line(id):
     find products using our products id: img title and price will use.
     also show number in template.
     """
-    order = Orders.query.filter(Orders.orders_id == id+1).first()
+    order = Orders.query.filter(Orders.orders_id == id).first()
     products_id = ast.literal_eval(order.product_id)
     products_number = ast.literal_eval(order.number)
     p = [Products.query.filter(Products.id == i).first() for i in products_id]
@@ -433,6 +439,7 @@ def filter_products():
     return render_template('filter.html', form=form)
 
 
+"""
 @app.route('/f', methods=['POST', 'GET'])
 def filter():
     form = FilterProductsForm()
@@ -474,6 +481,7 @@ def cheapest():
 def newst():
     keyword.sort(key=lambda i: i.date, reverse=True)
     return render_template('filter_result.html', keyword=keyword)
+"""
 
 
 @app.route('/popular', methods=['POST', 'GET'])
