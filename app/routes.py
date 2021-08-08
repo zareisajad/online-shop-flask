@@ -37,7 +37,7 @@ def create_admin():
     first before app executes any task - we create admin.
     and pass "Admin" to the user.
     """
-    if not User.query.filter_by(email='admin@example.com').first():        
+    if not User.query.filter_by(email='admin@example.com').first():
         user = User(name='admin', email='admin@example.com', role='Admin')
         user.set_password('Password1')
         db.session.add(user)
@@ -99,12 +99,6 @@ def login():
 
 @app.route('/logout')
 def logout():
-    """
-    Logging Out
-    -----------
-    we call logout_user() from flask login
-    redirect user to the main page, and that's it.
-    """
     logout_user()
     return redirect(url_for('main_page'))
 
@@ -127,7 +121,7 @@ def main_page():
 @login_required_role(role="Admin")
 def add_product():
     """
-    Add New Product
+    Add New Product | *Avaiable For Admin*
     ---------------
     """
     form = AddProductForm()
@@ -160,7 +154,7 @@ def add_product():
 @login_required_role(role="Admin")
 def add_category():
     """
-    Add New Category
+    Add New Category | *Avaiable For Admin*
     ----------------
     """
     form = AddCategoryForm()
@@ -175,90 +169,11 @@ def add_category():
         'add_category.html', form=form, category=category)
 
 
-@app.route('/filter', methods=['POST', 'GET'])
-def filter_products():
-    form = FilterProductsForm()
-    return render_template('filter.html', form=form)
-
-
-@app.route('/f', methods=['POST', 'GET'])
-def filter():
-    form = FilterProductsForm()
-    global keyword
-    keyword = Products.query.filter(
-        Products.title.contains(form.keyword.data),
-        Products.category == form.category.data,
-        Products.price > form.min_price.data,
-        Products.price < form.max_price.data
-        ).order_by(asc(Products.price)).all()
-    return render_template('filter_result.html', keyword=keyword)
-
-
-@app.route('/popular-filter', methods=['POST', 'GET'])
-def popular():
-    keyword.sort(key=lambda i: i.rate, reverse=True)
-    return render_template('filter_result.html', keyword=keyword)
-
-
-@app.route('/sold-filter', methods=['POST', 'GET'])
-def sold():
-    keyword.sort(key=lambda i: i.sold, reverse=True)
-    return render_template('filter_result.html', keyword=keyword)
-
-
-@app.route('/expensive_filter', methods=['POST', 'GET'])
-def expensive():
-    keyword.sort(key=lambda i: i.price, reverse=True)
-    return render_template('filter_result.html', keyword=keyword)
-
-
-@app.route('/cheapest-filter', methods=['POST', 'GET'])
-def cheapest():
-    keyword.sort(key=lambda i: i.price)
-    return render_template('filter_result.html', keyword=keyword)
-
-
-@app.route('/newst-filter', methods=['POST', 'GET'])
-def newst():
-    keyword.sort(key=lambda i: i.date, reverse=True)
-    return render_template('filter_result.html', keyword=keyword)
-
-
-@app.route('/popular', methods=['POST', 'GET'])
-def popular_filter():
-    keyword = Products.query.order_by(desc(Products.rate)).all()
-    return render_template('keyword.html', keyword=keyword)
-
-
-@app.route('/most-sold', methods=['POST', 'GET'])
-def sold_filter():
-    keyword = Products.query.order_by(desc(Products.sold)).all()
-    return render_template('keyword.html', keyword=keyword)
-
-
-@app.route('/expensive', methods=['POST', 'GET'])
-def expensive_filter():
-    keyword = Products.query.order_by(desc(Products.price)).all()
-    return render_template('keyword.html', keyword=keyword)
-
-
-@app.route('/cheapest', methods=['POST', 'GET'])
-def cheapest_filter():
-    keyword = Products.query.order_by(asc(Products.price)).all()
-    return render_template('keyword.html', keyword=keyword)
-
-
-@app.route('/new', methods=['POST', 'GET'])
-def newst_filter():
-    keyword = Products.query.order_by(desc(Products.date)).all()
-    return render_template('keyword.html', keyword=keyword)
-
-
 @app.route('/manage', methods=['POST', 'GET'])
 @login_required_role(role="Admin")
 def manage_products():
     """
-    Manage Products Page
+    Manage Products Page | *Avaiable For Admin*
     --------------------
     """
     all_products = Products.query.all()
@@ -271,7 +186,7 @@ def manage_products():
 @login_required_role(role="Admin")
 def delete(id):
     """
-    Delete Products
+    Delete Products | *Avaiable For Admin*
     ---------------
     """
     g = Gallery.query.all()
@@ -306,40 +221,93 @@ def product_detail(id):
          gallery=gallery, category=category)
 
 
-@app.route('/orders-list', methods=['POST','GET'])
-@login_required_role(role="Admin")
-def orders_list():
+@app.route('/cart/<int:id>', methods=['POST','GET'])
+@login_required
+def cart(id):
     """
-    show all orders
+    Add Products To Cart
+    --------------------
+    """
+    ca = Cart.query.filter(
+         Cart.product_id==id, Cart.cart_id==current_user.id).first()
+    if ca:
+        flash('این محصول قبلا اضافه شده است')
+    else:
+        c = Cart(product_id=id, number=1, amount=0,
+                 total=0, cart_id=current_user.id)
+        db.session.add(c)
+        flash('به سبد خرید اضافه شد')
+    db.session.commit()
+    return redirect(url_for('show_cart', id=current_user.id))
+
+
+@app.route('/user-<int:id>', methods=['POST','GET'])
+@login_required
+def show_cart(id):
+    """
+    User Cart
+    ---------
+    """
+    user_cart = current_user.cart
+    if not user_cart:
+        flash('سبد خرید شما خالی است')
+    cart_products =[
+        Products.query.filter(Products.id==i.product_id).first()
+        for i in current_user.cart
+    ]
+    return render_template(
+        'cart.html',cart_products=cart_products, user_cart=user_cart, zip=zip)
+
+
+@app.route('/del/cart/<int:id>', methods=['GET', 'POST'])
+def delete_cart(id):
+    """
+    Remove Items From Cart
+    ----------------------
+    """
+    c = Cart.query.filter(Cart.cart_id==current_user.id,
+                          Cart.product_id==id).first()
+    db.session.delete(c)
+    db.session.commit()
+    return redirect(url_for('show_cart', id=current_user.id))
+
+
+@app.route('/c/add/<int:id>', methods=['POST','GET'])
+def add_num(id):
+    """
+    Add Product Number In Cart
+    --------------------------
+    """
+    c = Cart.query.filter(Cart.product_id==id,
+                          Cart.cart_id==current_user.id).first()
+    p = Products.query.filter(Products.id==id).first()
+    if p.inventory == 0:
+        flash('موجودی این محصول به اتمام رسید')
+        return redirect(url_for('show_cart', id=current_user.id))
+    c.date = datetime.datetime.now()
+    c.number += 1
+    p.inventory -= 1
+    db.session.commit()
+    return redirect(url_for('show_cart', id=current_user.id))
+
+
+@app.route('/c/reduce/<int:id>', methods=['POST','GET'])
+def reduce_num(id):
+    """
+    Reduce Product Number In Cart
     ---------------
-    query the Orders table and find
-    all the users that have any order.
     """
-    orders = Orders.query.filter(Orders.orders_id==User.id).all()
-    users = [User.query.filter(User.id==i.orders_id).first() for i in orders]
-    if not orders :
-        flash('سفارشی ثبت نشده است')
-    return render_template('orders.html', orders=orders, users=users, zip=zip)
-
-
-@app.route('/order<int:id>', methods=['POST','GET'])
-@login_required_role(role="Admin")
-def order_line(id):
-    """
-    show each order details
-    ------------------------
-    we receive the list of product ID and product's number
-    (the number selected by user in the cart ) as a list.
-    First we return them from string to list.
-    find products using our products id: img title and price will use.
-    also show number in template.
-    """
-    order = Orders.query.filter(Orders.orders_id == id+1).first()
-    products_id = ast.literal_eval(order.product_id)
-    products_number = ast.literal_eval(order.number)
-    p = [Products.query.filter(Products.id == i).first() for i in products_id]
-    return render_template('order_line.html', number=products_number,
-                           product=p, order=order, zip=zip)
+    c = Cart.query.filter(Cart.product_id==id,
+                          Cart.cart_id==current_user.id).first()
+    p = Products.query.filter(Products.id==id).first()
+    if c.number != 0:
+        c.date = datetime.datetime.now()
+        c.number -= 1
+        p.inventory += 1
+        db.session.commit()
+    else:
+        return redirect(url_for('show_cart',id=current_user.id))
+    return redirect(url_for('show_cart',id=current_user.id))
 
 
 @app.route('/user-checkout', methods=['POST','GET'])
@@ -423,55 +391,119 @@ def payment_gateway(name):
     return render_template('gateway.html', o=o)
 
 
-@app.route('/cart/<int:id>', methods=['POST','GET'])
-@login_required
-def cart(id):
+@app.route('/orders-list', methods=['POST','GET'])
+@login_required_role(role="Admin")
+def orders_list():
     """
-    Add Products To Cart
-    --------------------
+    show all orders | *Avaiable For Admin*
+    ---------------
+    query the Orders table and find
+    all the users that have any order.
     """
-    ca = Cart.query.filter(
-         Cart.product_id==id, Cart.cart_id==current_user.id).first()
-    if ca:
-        flash('این محصول قبلا اضافه شده است')
-    else:
-        c = Cart(product_id=id, number=1, amount=0,
-                 total=0, cart_id=current_user.id)
-        db.session.add(c)
-        flash('به سبد خرید اضافه شد')
-    db.session.commit()
-    return redirect(url_for('show_cart', id=current_user.id))
+    orders = Orders.query.filter(Orders.orders_id==User.id).all()
+    users = [User.query.filter(User.id==i.orders_id).first() for i in orders]
+    if not orders :
+        flash('سفارشی ثبت نشده است')
+    return render_template('orders.html', orders=orders, users=users, zip=zip)
 
 
-@app.route('/user-<int:id>', methods=['POST','GET'])
-@login_required
-def show_cart(id):
+@app.route('/order<int:id>', methods=['POST','GET'])
+@login_required_role(role="Admin")
+def order_line(id):
     """
-    User Cart
-    ---------
+    show each order details | *Avaiable For Admin*
+    ------------------------
+    we receive the list of product ID and product's number
+    (the number selected by user in the cart ) as a list.
+    First we return them from string to list.
+    find products using our products id: img title and price will use.
+    also show number in template.
     """
-    user_cart = current_user.cart
-    if not user_cart:
-        flash('سبد خرید شما خالی است')
-    cart_products =[
-        Products.query.filter(Products.id==i.product_id).first()
-        for i in current_user.cart
-    ]
-    return render_template(
-        'cart.html',cart_products=cart_products, user_cart=user_cart, zip=zip)
+    order = Orders.query.filter(Orders.orders_id == id+1).first()
+    products_id = ast.literal_eval(order.product_id)
+    products_number = ast.literal_eval(order.number)
+    p = [Products.query.filter(Products.id == i).first() for i in products_id]
+    return render_template('order_line.html', number=products_number,
+                           product=p, order=order, zip=zip)
 
 
-@app.route('/del/cart/<int:id>', methods=['GET', 'POST'])
-def delete_cart(id):
-    """
-    Remove Items From Cart
-    ----------------------
-    """
-    c = Cart.query.filter(Cart.cart_id==current_user.id,
-                          Cart.product_id==id).first()
-    db.session.delete(c)
-    db.session.commit()
-    return redirect(url_for('show_cart', id=current_user.id))
+@app.route('/filter', methods=['POST', 'GET'])
+def filter_products():
+    form = FilterProductsForm()
+    return render_template('filter.html', form=form)
+
+
+@app.route('/f', methods=['POST', 'GET'])
+def filter():
+    form = FilterProductsForm()
+    global keyword
+    keyword = Products.query.filter(
+        Products.title.contains(form.keyword.data),
+        Products.category == form.category.data,
+        Products.price > form.min_price.data,
+        Products.price < form.max_price.data
+        ).order_by(asc(Products.price)).all()
+    return render_template('filter_result.html', keyword=keyword)
+
+
+@app.route('/popular-filter', methods=['POST', 'GET'])
+def popular():
+    keyword.sort(key=lambda i: i.rate, reverse=True)
+    return render_template('filter_result.html', keyword=keyword)
+
+
+@app.route('/sold-filter', methods=['POST', 'GET'])
+def sold():
+    keyword.sort(key=lambda i: i.sold, reverse=True)
+    return render_template('filter_result.html', keyword=keyword)
+
+
+@app.route('/expensive_filter', methods=['POST', 'GET'])
+def expensive():
+    keyword.sort(key=lambda i: i.price, reverse=True)
+    return render_template('filter_result.html', keyword=keyword)
+
+
+@app.route('/cheapest-filter', methods=['POST', 'GET'])
+def cheapest():
+    keyword.sort(key=lambda i: i.price)
+    return render_template('filter_result.html', keyword=keyword)
+
+
+@app.route('/newst-filter', methods=['POST', 'GET'])
+def newst():
+    keyword.sort(key=lambda i: i.date, reverse=True)
+    return render_template('filter_result.html', keyword=keyword)
+
+
+@app.route('/popular', methods=['POST', 'GET'])
+def popular_filter():
+    keyword = Products.query.order_by(desc(Products.rate)).all()
+    return render_template('keyword.html', keyword=keyword)
+
+
+@app.route('/most-sold', methods=['POST', 'GET'])
+def sold_filter():
+    keyword = Products.query.order_by(desc(Products.sold)).all()
+    return render_template('keyword.html', keyword=keyword)
+
+
+@app.route('/expensive', methods=['POST', 'GET'])
+def expensive_filter():
+    keyword = Products.query.order_by(desc(Products.price)).all()
+    return render_template('keyword.html', keyword=keyword)
+
+
+@app.route('/cheapest', methods=['POST', 'GET'])
+def cheapest_filter():
+    keyword = Products.query.order_by(asc(Products.price)).all()
+    return render_template('keyword.html', keyword=keyword)
+
+
+@app.route('/new', methods=['POST', 'GET'])
+def newst_filter():
+    keyword = Products.query.order_by(desc(Products.date)).all()
+    return render_template('keyword.html', keyword=keyword)
 
 
 @app.route('/fa', methods=['GET', 'POST'])
@@ -494,44 +526,6 @@ def final_amount():
         a.total = total_amount
         db.session.commit()
     return redirect(url_for('checkout'))
-
-
-@app.route('/c/add/<int:id>', methods=['POST','GET'])
-def add_num(id):
-    """
-    Add Product Number In Cart
-    --------------------------
-    """
-    c = Cart.query.filter(Cart.product_id==id,
-                          Cart.cart_id==current_user.id).first()
-    p = Products.query.filter(Products.id==id).first()
-    if p.inventory == 0:
-        flash('موجودی این محصول به اتمام رسید')
-        return redirect(url_for('show_cart', id=current_user.id))
-    c.date = datetime.datetime.now()
-    c.number += 1
-    p.inventory -= 1
-    db.session.commit()
-    return redirect(url_for('show_cart', id=current_user.id))
-
-
-@app.route('/c/reduce/<int:id>', methods=['POST','GET'])
-def reduce_num(id):
-    """
-    Reduce Product Number In Cart
-    ---------------
-    """
-    c = Cart.query.filter(Cart.product_id==id,
-                          Cart.cart_id==current_user.id).first()
-    p = Products.query.filter(Products.id==id).first()
-    if c.number != 0:
-        c.date = datetime.datetime.now()
-        c.number -= 1
-        p.inventory += 1
-        db.session.commit()
-    else:
-        return redirect(url_for('show_cart',id=current_user.id))
-    return redirect(url_for('show_cart',id=current_user.id))
 
 
 @app.route('/like/<int:id>', methods=['POST','GET'])
