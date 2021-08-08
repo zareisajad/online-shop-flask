@@ -5,12 +5,12 @@
   <main class="container">
     <!-- right Column / Image and gallery -->
     <div class="left-column">
-      <img src="{{product.photo}}" class="img-detail" 
+      <img src="{{product.photo}}" class="img-detail"
       style="width:400px;height:400px;">
       <div style="margin-right: 35px;text-align: right;">
       {% for i in gallery %}
       {% if i.p_id == product.id %}
-      <img src="{{i.pics}}" 
+      <img src="{{i.pics}}"
       style="width:130px;height:130px;;margin:5px">
       {% endif %}
       {% endfor %}
@@ -44,6 +44,6 @@
       </p>
       </div>
     </main>
-    </html>    
+    </html>
     {% endblock %}
   </body>
