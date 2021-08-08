@@ -2,22 +2,23 @@
 <h1>{% block title %}مدیریت محصولات{% endblock %}</h1>
 {% block header %}مدیریت محصولات{% endblock %}
 {% block content %}
+{% if products %}
 <table >
     <tr>
       <th></th>
       <th>محصول</th>
-      <th>قیمت</th> 
+      <th>قیمت</th>
       <th>قیمت با تخفیف</th>
       <th>موجودی</th>
       <th>فروخته شده</th>
     </tr>
-    {% for pic in products %}   
+    {% for pic in products %}
     <tr>
       <td>
         <a name='delete' href="{{url_for('delete', id=pic.id)}}" class="btn btn-danger"> حذف </a>
       </td>
       <td style="text-align: right;">
-        <img class="card-img-top" src="{{pic.photo}}" style="width: 70px; height: 70px;"> 
+        <img class="card-img-top" src="{{pic.photo}}" style="width: 70px; height: 70px;">
         <span style="padding:10px">{{pic.title}}</span>
       </td>
       <td>{{ '{0:,}'.format(pic.price | int) }} تومان</td>
@@ -31,4 +32,5 @@
     {% endfor %}
     </tr>
 </table>
+{% endif %}
 {% endblock %}
