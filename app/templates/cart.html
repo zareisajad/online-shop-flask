@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block header %}سبد خرید{% endblock %}
 {% block content %}
+{% if user_cart %}
 <table>
-  <tr>      
+  <tr>
     <th></th>
     <th>محصول</th>
     <th>قیمت</th>
@@ -17,14 +18,16 @@
         <i class="material-icons" style="color:red">remove_circle</i></a>
       </td>
       <td style="text-align: right;">
-        <img class="card-img-top" src="{{i.photo}}" style="width:80px;height:80px;padding:5px;"> 
-        <span style="padding:10px">{{i.title}}</span>
+        <img class="card-img-top" src="{{i.photo}}" style="width:80px;height:80px;padding:5px;">
+        <a href="{{url_for('product_detail', id=i.id)}}">
+          <span style="padding:10px">{{i.title}}</span>
+        </a>
       </td>
       {% if not i.discounted %}
       <td>{{ '{0:,}'.format(i.price) }} تومان</td>
       {% else %}
       <td>{{ '{0:,}'.format(i.discounted) }} تومان</td>
-      {% endif %}  
+      {% endif %}
       <td>
         <a href="{{url_for('add_num', id=i.id)}}" class="btn btn-primary" >+</a>
         {{ a.number }} عدد
@@ -34,16 +37,22 @@
         {% if not i.discounted %}
         {% set amount =  a.number * i.price %}
         {% else %}
-        {% set amount =  a.number * i.discounted %}      
-        {% endif %}  
+        {% set amount =  a.number * i.discounted %}
+        {% endif %}
         {{ '{0:,}'.format(amount) }} تومان
       </td>
       {% set _ = total.append(amount) %}
       {% endfor %}
-      
     </tr>
-  </table>
-  <a style="color: aliceblue;" class="btn btn-info">
-    <b>مبلغ نهایی: {{ '{0:,}'.format(total | sum()) }} تومان</b></a>
-    <a href="{{url_for('final_amount')}}" class="btn btn-success" >تسویه حساب</a>
-    {% endblock %}
+    <tr class="cart-final-price">
+      <th></th><th></th><th></th><th></th>
+      <td style="background-color: #e02926;color:white;">
+      <b>مبلغ نهایی: {{ '{0:,}'.format(total | sum()) }} تومان</b></a>
+      </td>
+    </tr>
+</table>
+<div class="cart-checkout"><br>
+<a href="{{url_for('final_amount')}}" class="btn btn-info" style="width:100%;" >تسویه حساب</a>
+</div><br>
+{% endif %}
+{% endblock %}
