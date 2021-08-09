@@ -22,9 +22,15 @@
         <h1>{{product.title}}</h1>
         <p>دسته بندی: {{category.name}}</p>
         <p>موجودی : {{product.inventory}} عدد</p>
-        <p>
-          {{product.short_desc}}
-        </p>
+        <p> امتیاز محصول : {{product.rate}} امتیاز</p>
+        <!-- product rate icons -->
+      <p>به این محصول امتیاز دهید:</p>
+        <a href="{{ url_for('reduce_rate', id=product.id) }}">
+        <span style="font-size: 20px;"class="material-icons">&#xe8db;</span></a>
+        <a href="{{ url_for('add_rate', id=product.id) }}">
+        <span style="font-size: 20px;"class="material-icons">&#xe8dc;</span></a>
+        <!-- short description -->
+        <p>{{product.short_desc}}</p>
       </div>
       <!-- Product Pricing -->
       <div class="product-price">
@@ -39,11 +45,9 @@
         <a href="{{url_for('cart', id=product.id)}}"class="btn btn-primary">افزودن به سبد خرید</a>
       </div>
       <hr>
-      <p style="color: rgb(92, 92, 92);">
-        {{product.desc}}
-      </p>
+      <!-- long description -->
+      <p style="color: rgb(92, 92, 92);">{{product.desc}}</p>
       </div>
     </main>
-    </html>
-    {% endblock %}
-  </body>
+  {% endblock %}
+</body>
