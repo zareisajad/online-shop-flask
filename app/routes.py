@@ -545,7 +545,8 @@ def add_rate(id):
     p = Products.query.filter_by(id=id).first()
     p.rate += 1
     db.session.commit()
-    return redirect(url_for('main_page'))
+    flash('امتیاز ثبت شد')
+    return redirect(url_for('product_detail', id=id))
 
 
 @app.route('/dislike/<int:id>', methods=['POST','GET'])
@@ -557,4 +558,5 @@ def reduce_rate(id):
     p = Products.query.filter_by(id=id).first()
     p.rate -= 1
     db.session.commit()
-    return redirect(url_for('main_page'))
+    flash('امتیاز ثبت شد')
+    return redirect(url_for('product_detail', id=id))
