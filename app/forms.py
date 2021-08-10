@@ -70,7 +70,6 @@ class LoginForm(FlaskForm):
 
 class CheckoutForm(FlaskForm):
     name = StringField('نام و نام خانوادگی:', validators=[DataRequired()])
-    country = StringField('کشور:', validators=[DataRequired()])
     city =  StringField('شهر:', validators=[DataRequired()])
     address =  TextField('آدرس کامل:', validators=[DataRequired()])
     phone =  StringField('شماره تماس:', validators=[DataRequired()])
