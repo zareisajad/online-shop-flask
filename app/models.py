@@ -53,7 +53,11 @@ class Cart(db.Model):
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     orders_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    date = db.Column(db.DateTime, default=datetime.now)
+
+    start_payment_date = db.Column(db.DateTime)
+    create_order_date = db.Column(db.DateTime)
+    finish_payment_date = db.Column(db.DateTime)
+
     status = db.Column(db.String)
     payment_method = db.Column(db.String)
     name = db.Column(db.String)
