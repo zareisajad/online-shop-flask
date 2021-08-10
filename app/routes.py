@@ -3,6 +3,7 @@ import ast
 import datetime
 from functools import wraps
 
+from persiantools.jdatetime import JalaliDateTime
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import desc, asc
@@ -84,8 +85,8 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None:
-            flash('کاربری با ایمیل پیدا نشد')
-            return redirect(url_for('login'))
+            flash(' کاربری با این ایمیل پیدا نشد - لطفا ابتدا ثبت نام کنید')
+            return redirect(url_for('register'))
         if user and not user.check_password(form.password.data):
             flash('رمز عبور اشتباه است')
             return redirect(url_for('login'))
@@ -228,6 +229,9 @@ def cart(id):
     Add Products To Cart
     --------------------
     """
+    if Products.query.filter(Products.id==id).first().inventory == 0:
+        flash('این محصول موجود نیست')
+        return redirect(url_for('main_page'))
     ca = Cart.query.filter(
          Cart.product_id==id, Cart.cart_id==current_user.id).first()
     if ca:
@@ -236,9 +240,6 @@ def cart(id):
         c = Cart(product_id=id, number=1, amount=0,
                  total=0, cart_id=current_user.id)
         db.session.add(c)
-        p = Products.query.filter(Products.id==id).first()
-        p.sold += 1
-        p.inventory -= 1
         flash('به سبد خرید اضافه شد')
     db.session.commit()
     return redirect(url_for('main_page'))
@@ -271,8 +272,6 @@ def delete_cart(id):
     c = Cart.query.filter(Cart.cart_id==current_user.id,
                           Cart.product_id==id).first()
     p = Products.query.filter(Products.id==id).first()
-    p.sold -= c.number
-    p.inventory += c.number
     db.session.delete(c)
     db.session.commit()
     return redirect(url_for('show_cart', id=current_user.id))
@@ -332,44 +331,53 @@ def payment():
     Payment Page
     ------------
     """
-    c = current_user.cart
-    for i in range(len(c)):
-        # reduce product inventory
-        Products.query.filter(Products.id==c[i].product_id).first().inventory -= c[i].number - 1
-        # add product sold number
-        Products.query.filter(Products.id==c[i].product_id).first().sold += c[i].number - 1
-    form = CheckoutForm()
-    o = Orders.query.filter(Orders.orders_id==current_user.id).first()
+    user_cart = current_user.cart
     # extracting user info enetred in checkout form
+    form = CheckoutForm()
     name = form.name.data
-    country = form.country.data
     city = form.city.data
     address = form.address.data
     phone = form.phone.data
     email = form.email.data
-    if not o:
-        orders = Orders(
-            status='در انتظار پرداخت',
-            orders_id=current_user.id, total=c[-1].total,
-            number=str([c[i].number for i in range(len(c))]),
-            product_id=str([c[i].product_id for i in range(len(c))]),
-            payment_method='آنلاین', name=name, country=country,
-            city=city, address=address, phone=phone, email=email)
-        db.session.add(orders)
-        db.session.commit()
-        for i in c:
+    # insert user order's data to Orders table 
+    orders = Orders(
+        status = 'در انتظار پرداخت',
+        orders_id = current_user.id, payment_method = 'آنلاین',
+        name=name, city=city, address=address, phone=phone,
+        email=email, total = user_cart[-1].total,
+        create_order_date=datetime.datetime.now(),
+        number = str(
+            [user_cart[i].number for i in range(len(user_cart))]),
+        product_id = str(
+            [user_cart[i].product_id for i in range(len(user_cart))])
+        )
+    db.session.add(orders)
+    db.session.commit()
+    # find user order 
+    orders = Orders.query.filter(Orders.orders_id==current_user.id).first()
+    # if user select cash *نقدی* option in form
+    if form.payment.data == 'نقدی':
+        for i in range(len(user_cart)):
+            # reduce product inventory
+            Products.query.filter(
+                Products.id == user_cart[i].product_id
+                ).first().inventory -= user_cart[i].number
+            # add product sold number
+            Products.query.filter(
+                Products.id==user_cart[i].product_id
+                ).first().sold += user_cart[i].number
+        # change paymnet status to 'نقدی', which was 'آنلاین'
+        orders.payment_method = 'نقدی'
+        flash('پرداخت موفق')
+        # delete user cart's items
+        for i in user_cart:
             db.session.delete(i)
         db.session.commit()
-    if form.payment.data == 'نقدی':
-        orders = Orders.query.filter(
-            Orders.orders_id==current_user.id).first()
-        orders.payment_method = 'نقدی'
-        db.session.commit()
-        flash('پرداخت موفق')
         return redirect(url_for('main_page'))
-    if o:
-        flash('این سفارش قبلا ثبت شده است')
-        return redirect(url_for('main_page'))
+
+    # track date and time when user goes to payment gatewat
+    orders.start_payment_date = datetime.datetime.now()
+    db.session.commit()
     return redirect(url_for('payment_gateway', name='None'))
 
 
@@ -382,8 +390,19 @@ def payment_gateway(name):
     """
     o = Orders.query.filter(Orders.orders_id==current_user.id).first()
     if name == 'پرداخت':
+        c = current_user.cart
+        for i in range(len(c)):
+            # reduce product inventory
+            Products.query.filter(
+                Products.id==c[i].product_id).first().inventory -= c[i].number
+            # add product sold number
+            Products.query.filter(
+                Products.id==c[i].product_id).first().sold += c[i].number 
+        for i in c:
+            db.session.delete(i)
         order = Orders.query.filter(Orders.orders_id==current_user.id).first()
         order.status = 'پرداخت شده'
+        order.finish_payment_date = datetime.datetime.now()
         flash('پرداخت موفق')
         db.session.commit()
         return redirect(url_for('main_page'))
@@ -410,7 +429,8 @@ def orders_list():
     users = [User.query.filter(User.id==i.orders_id).first() for i in orders]
     if not orders :
         flash('سفارشی ثبت نشده است')
-    return render_template('orders.html', orders=orders, users=users, zip=zip)
+    return render_template('orders.html', orders=orders, users=users,
+                            zip=zip, JalaliDateTime=JalaliDateTime)
 
 
 @app.route('/order<int:id>', methods=['POST','GET'])
@@ -429,8 +449,9 @@ def order_line(id):
     products_id = ast.literal_eval(order.product_id)
     products_number = ast.literal_eval(order.number)
     p = [Products.query.filter(Products.id == i).first() for i in products_id]
-    return render_template('order_line.html', number=products_number,
-                           product=p, order=order, zip=zip)
+    return render_template(
+        'order_line.html', number=products_number, product=p,
+         order=order, zip=zip, JalaliDateTime=JalaliDateTime)
 
 
 @app.route('/filter', methods=['POST', 'GET'])
