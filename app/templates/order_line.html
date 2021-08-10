@@ -52,13 +52,23 @@
     </p>
     <p>
         <b>تاریخ ثبت پرداخت:</b>
+        {% if not order.start_payment_date %}
+        {{order.status}}
+        {% else %}
+        {{ JalaliDateTime(order.start_payment_date).strftime('%m/%d - %H:%M:%S') }}
+        {% endif %}
    </p>
    <p>
     <b>تاریخ تکمیل پرداخت:</b>
+        {% if not order.finish_payment_date %}
+        {{order.status}}
+        {% else %}
+        {{ JalaliDateTime(order.finish_payment_date).strftime('%m/%d - %H:%M:%S') }}
+        {% endif %}
+
     </p>
     <hr>
        <p>نام و نام خانوادگی: {{order.name}}</p>
-       <p>کشور : {{order.country}}</p>
        <p>شهر : {{order.city}}</p>
        <p>آدرس : {{order.address}}</p>
        <p>تلفن: {{order.phone}}</p>
