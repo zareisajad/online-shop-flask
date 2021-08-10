@@ -2,9 +2,8 @@
 <h1>{% block title %}محصولات{% endblock %}</h1>
 {% block header %}محصولات{% endblock %}
 <div class="container">
-  {% block content %}
+{% block content %}
 <body style="background: #f0f2f5;text-align:right;">
-
 <div class="filter-buttons">
   <form method="get">
     <button class="btn btn-primary" type="submit"
@@ -27,25 +26,28 @@
     </button> -->
 </div>
 {% for p in keyword %}
-<div class="card">
-  <img class="img-card" src={{ p.photo }} style="width: 180px; height: 180px;">
+<div class="card" style="width: 18rem;margin-bottom:10px;">
+  <img class="img-card" src="{{p.photo}}">
   <div class="card-body">
-    <h5 class="card-title">{{ p.title }}</h5>
+    <h5 class="card-title">{{p.title}}</h5>
+    {% if p.inventory == 0 %}
+     <b><p style="color:#e02926;">موجود نیست</p></b>
+    {% else %}
     {% if not p.discounted %}
     <p></p>
-    <p style="color: red;"><b> {{'{0:,}'.format(p.price|int)}} تومان</p></b>
+    <!-- regular price -->
+    <p style="color:#e02926;"><b> {{'{0:,}'.format(p.price|int)}} تومان</b></p>
     {% else %}
-    <p style="color: red;"><b>{{'{0:,}'.format(p.discounted|int)}} تومان</p></b>
+    <!-- discounted price -->
+    <p style="color:#e02926;"><b>{{'{0:,}'.format(p.discounted|int)}} تومان</b></p>
     {% endif %}
+    {% endif %}
+    <!-- add to cart icon -->
     <a style="padding: 3px;" href="{{url_for('cart', id=p.id)}}" class="btn btn-primary">
       <i style="padding: 5px;" class="material-icons">&#xe854;</i></a>
+    <!-- details button -->
     <a href="{{url_for('product_detail', id=p.id)}}" class="btn btn-primary" style="padding: 9px;">مشاهده</a>
   </div>
-  <a href="{{ url_for('reduce_rate', id=p.id) }}">
-    <span style="font-size: 20px;"class="material-icons">&#xe8db;</span></a>
-    &nbsp; {{p.rate}} &nbsp;
-  <a href="{{ url_for('add_rate', id=p.id) }}">
-    <span style="font-size: 20px;"class="material-icons">&#xe8dc;</span></a>
 </div>
 {% endfor %}
 </div>
