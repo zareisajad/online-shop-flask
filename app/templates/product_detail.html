@@ -5,8 +5,7 @@
   <main class="container">
     <!-- right Column / Image and gallery -->
     <div class="left-column">
-      <img src="{{product.photo}}" class="img-detail"
-      style="width:400px;height:400px;">
+      <img src="{{product.photo}}" class="img-detail"style="width:400px;height:400px;">
       <div style="margin-right: 35px;text-align: right;">
       {% for i in gallery %}
       {% if i.p_id == product.id %}
@@ -34,12 +33,16 @@
       </div>
       <!-- Product Pricing -->
       <div class="product-price">
+        {% if product.inventory == 0 %}
+        <span style="color:red;">موجود نیست</span>
+        {% else %}
         {% if product.discounted %}
         <span><b><del>{{'{0:,}'.format(product.price | int)}} تومان</del></b></span>
         &nbsp; &nbsp;
         <span><b>{{'{0:,}'.format(product.discounted | int)}} تومان</b></span>
         {% else %}
         <span><b>{{'{0:,}'.format(product.price | int)}} تومان</b></span>
+        {% endif %}
         {% endif %}
         &nbsp; &nbsp;
         <a href="{{url_for('cart', id=product.id)}}"class="btn btn-primary">افزودن به سبد خرید</a>
