@@ -3,7 +3,6 @@
 <div class="container" >
 {% block content %}
 <body style="background: #f0f2f5;text-align:right;" >
-
 {% if all_products %}
 <div class="filter-buttons">
   <form method="get">
@@ -28,16 +27,19 @@
 </div>
 {% for p in all_products %}
 <div class="card" style="width: 18rem;margin-bottom:10px;">
-  <img class="card-img-top" src="{{p.photo}}" style="width:170px;height:170px;">
+  <img class="img-card" src="{{p.photo}}">
   <div class="card-body">
     <h5 class="card-title">{{p.title}}</h5>
+    {% if p.inventory == 0 %}
+   <b> <p style="color:#e02926;">موجود نیست</p></b>
+    {% else %}
     {% if not p.discounted %}
-    <p></p>
     <!-- regular price -->
     <p style="color:#e02926;"><b> {{'{0:,}'.format(p.price|int)}} تومان</b></p>
     {% else %}
     <!-- discounted price -->
     <p style="color:#e02926;"><b>{{'{0:,}'.format(p.discounted|int)}} تومان</b></p>
+    {% endif %}
     {% endif %}
     <!-- add to cart icon -->
     <a style="padding: 3px;" href="{{url_for('cart', id=p.id)}}" class="btn btn-primary">
