@@ -65,7 +65,7 @@ def register():
         db.session.commit()
         flash('ثبت نام انجام شد')
         return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+    return render_template('register.html', form=form, title='ثبت نام')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -95,7 +95,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('main_page')
         return redirect(next_page)
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form, title="ورود به حساب کاربری")
 
 
 @app.route('/logout')
@@ -115,7 +115,7 @@ def main_page():
     all_products = Products.query.all()
     if not all_products:
         flash('محصولی موجود نیست')
-    return render_template('main_page.html', all_products=all_products)
+    return render_template('main_page.html', all_products=all_products, title='محصولات')
 
 
 @app.route('/add-product', methods=['POST', 'GET'])
@@ -126,29 +126,30 @@ def add_product():
     ---------------
     """
     form = AddProductForm()
-    if form.validate_on_submit():
-        c = Category.query.filter_by(name=str(form.category.data)).first()
-        uploaded_file = form.photo.data
-        filename = secure_filename(uploaded_file.filename)
-        uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], filename))
-        url = (os.path.join('static/images', filename))
-        p = Products(
-            title=form.title.data, price=form.price.data,
-            discounted=form.discounted.data, sold=0, rate=0,
-            short_desc=form.short_desc.data, desc=form.desc.data,
-            inventory=form.inventory.data, photo=url, category_id=c.id)
-        db.session.add(p)
-        db.session.commit()
-        images = form.photos.data
-        for img in images:
-            filename = secure_filename(img.filename)
-            img.save(os.path.join(app.config['UPLOAD_GALLERY'], filename))
-            url = (os.path.join('static/gallery', filename))
-            files = Gallery(pics=url, p_id=p.id)
-            db.session.add(files)
-        db.session.commit()
-        return redirect(url_for('main_page'))
-    return render_template('add_product.html', form=form)
+    if request.method == "POST":   
+        if form.validate_on_submit():
+            c = Category.query.filter_by(name=str(form.category.data)).first()
+            uploaded_file = form.photo.data
+            filename = secure_filename(uploaded_file.filename)
+            uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], filename))
+            url = (os.path.join('static/images', filename))
+            p = Products(
+                title=form.title.data, price=form.price.data,
+                discounted=form.discounted.data, sold=0, rate=0,
+                short_desc=form.short_desc.data, desc=form.desc.data,
+                inventory=form.inventory.data, photo=url, category_id=c.id)
+            db.session.add(p)
+            db.session.commit()
+            images = form.photos.data
+            for img in images:
+                filename = secure_filename(img.filename)
+                img.save(os.path.join(app.config['UPLOAD_GALLERY'], filename))
+                url = (os.path.join('static/gallery', filename))
+                files = Gallery(pics=url, p_id=p.id)
+                db.session.add(files)
+            db.session.commit()
+            return redirect(url_for('main_page'))
+    return render_template('add_product.html', form=form, title='ایجاد محصول جدید')
 
 
 @app.route('/add-category', methods=['POST', 'GET'])
@@ -167,7 +168,7 @@ def add_category():
         return redirect(url_for('add_product'))
     category = Category.query.all()
     return render_template(
-        'add_category.html', form=form, category=category)
+        'add_category.html', form=form, category=category, title='ایجاد دسته بندی جدید')
 
 
 @app.route('/manage', methods=['POST', 'GET'])
@@ -180,7 +181,7 @@ def manage_products():
     all_products = Products.query.all()
     if not all_products:
         flash('محصولی موجود نیست')
-    return render_template('manage_products.html', products=all_products)
+    return render_template('manage_products.html', products=all_products, title='مدیریت محصولات')
 
 
 @app.route('/del/<int:id>', methods=['GET', 'POST'])
@@ -219,7 +220,7 @@ def product_detail(id):
     category = Category.query.filter_by(id=product.category_id).first()
     return render_template(
         'product_detail.html', product=product,
-         gallery=gallery, category=category)
+         gallery=gallery, category=category, title=product.title)
 
 
 @app.route('/cart/<int:id>', methods=['POST','GET'])
@@ -260,7 +261,7 @@ def show_cart(id):
         for i in current_user.cart
     ]
     return render_template(
-        'cart.html',cart_products=cart_products, user_cart=user_cart, zip=zip)
+        'cart.html',cart_products=cart_products, user_cart=user_cart, zip=zip, title='سبد خرید')
 
 
 @app.route('/del/cart/<int:id>', methods=['GET', 'POST'])
@@ -321,7 +322,7 @@ def checkout():
     p = [
         Products.query.filter(
         Products.id == i.product_id).first() for i in c]
-    return render_template('checkout.html', c=c, p=p, form=form, zip=zip)
+    return render_template('checkout.html', c=c, p=p, form=form, zip=zip, title='ثبت سفارش')
 
 
 @app.route('/user-payment', methods=['POST','GET'])
@@ -413,7 +414,7 @@ def payment_gateway(name):
         flash('عملیات پرداخت کنسل شد')
         db.session.commit()
         return redirect(url_for('main_page'))
-    return render_template('gateway.html', o=o)
+    return render_template('gateway.html', o=o, title='پرداخت')
 
 
 @app.route('/orders-list', methods=['POST','GET'])
@@ -430,7 +431,7 @@ def orders_list():
     if not orders :
         flash('سفارشی ثبت نشده است')
     return render_template('orders.html', orders=orders, users=users,
-                            zip=zip, JalaliDateTime=JalaliDateTime)
+                            zip=zip, JalaliDateTime=JalaliDateTime, title='لیست سفارشات')
 
 
 @app.route('/order<int:id>', methods=['POST','GET'])
@@ -451,7 +452,7 @@ def order_line(id):
     p = [Products.query.filter(Products.id == i).first() for i in products_id]
     return render_template(
         'order_line.html', number=products_number, product=p,
-         order=order, zip=zip, JalaliDateTime=JalaliDateTime)
+         order=order, zip=zip, JalaliDateTime=JalaliDateTime, title='جزئیات سفارش')
 
 
 @app.route('/filter', methods=['POST', 'GET'])
