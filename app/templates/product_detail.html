@@ -5,15 +5,25 @@
   <main class="container">
     <!-- right Column / Image and gallery -->
     <div class="left-column">
-      <img src="{{product.photo}}" class="img-detail"style="width:400px;height:400px;">
-      <div style="margin-right: 35px;text-align: right;">
+      <div class="container1">
+        <!-- main image -->
+        <div class="hover01 column" >
+          <div >
+            <figure>
+              <img src="{{product.photo}}" class="product-main-img" id="expandedImg">
+            </figure>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-container">
+      <img src="{{product.photo}}" class="gallery-images" onclick="myFunction(this);">
       {% for i in gallery %}
       {% if i.p_id == product.id %}
-      <img src="{{i.pics}}"
-      style="width:130px;height:130px;;margin:5px">
+      <img src="{{i.pics}}" class="gallery-images" onclick="myFunction(this);">
       {% endif %}
       {% endfor %}
       </div>
+    </div>
     </div>
     <!-- left Column -->
     <div class="right-column">
@@ -52,5 +62,12 @@
       <p style="color: rgb(92, 92, 92);">{{product.desc}}</p>
       </div>
     </main>
+  <script>
+    function myFunction(imgs) {
+    var expandImg = document.getElementById("expandedImg");
+    expandImg.src = imgs.src;
+    expandImg.parentElement.style.display = "block";
+    }
+  </script>
   {% endblock %}
 </body>
