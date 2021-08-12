@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% block header %}جزئیات محصول{% endblock %}
 {% block content %}
 <body>
   <main class="container">
@@ -55,7 +54,18 @@
         {% endif %}
         {% endif %}
         &nbsp; &nbsp;
+        &nbsp; &nbsp;
+        {% if current_user.is_authenticated %}
+        {% if product.inventory != 0 %}
+        <form action="{{ url_for('cart', id=product.id) }}" method="POST">
+          <input style="width: 70px;padding: 5px;border-radius: 5px;font-size: 16px;direction: ltr;border:1px solid #63636385" type="number" min="1" max={{product.inventory}} value="1" name="number">
+          <input class="btn btn-primary" type="submit" value="افزودن به سبدخرید">
+        </form>
+        {% endif %}
+        <p></p>
+        {% else %}
         <a href="{{url_for('cart', id=product.id)}}"class="btn btn-primary">افزودن به سبد خرید</a>
+        {%endif%}
       </div>
       <hr>
       <!-- long description -->
