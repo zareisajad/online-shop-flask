@@ -49,19 +49,11 @@
     <a style="background-color:#00c73c;border-radius:8px;font-size:14px;padding:8px;vertical-align:center;color:white;text-decoration: none;" href="{{ url_for('login') }}">حساب کاربری</a>
   {% endif %}
 </nav>
-<header>
-  <div class="hero-image">
-    <div class="hero-text">
-      <h2>
-        {% block header %}{% endblock %}
-      </h2>
-    </div>
-  </div>
-</header>
-<section class="content">
+
+<section style="margin-top: 30px;">
   {% with messages = get_flashed_messages(with_categories=true) %}
   {% for category, message in messages %}
-  <div class="alert alert-success"  style="text-align: center;" role="banner">{{ message }}</div>
+  <div class="alert alert-{{category}}" style="text-align: center;font-size: large;" role="banner">{{ message }}</div>
   {% endfor %}
   {% block content %}{% endblock %}
   {% endwith %}
