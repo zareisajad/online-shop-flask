@@ -1,28 +1,38 @@
 {% extends 'base.html' %}
-{% block header %}ثبت نام{% endblock %}
 {% block content %}
-<div class="row align-items-center justify-content-center">
-    <div class="col-md-4">
-        <div class="add-form">
-        <form method="POST" enctype="multipart/form-data">
-          {{ form.hidden_tag() }}
-          <div class="form-group">
-            <p>
-              {{ form.name.label }}<br>
-              {{ form.name(class_='add-form-fields')}}<br>
-            </p>
-            <p>
-              {{ form.email.label }}<br>
-              {{ form.email(class_='add-form-fields') }}<br>
-            </p>
-            <p>
-              {{ form.password.label }}<br>
-              {{ form.password(class_='add-form-fields')}}<br>
-            </p>
-          </div>
-          <button style="width: 100%;" type="submit" class="btn btn-primary">تائید</button>
-        </form>
+<body style="text-align: center;background: #f0f2f5;">
+  <div>
+    <div>
+        <div class="form-container">
+          <form method="POST" enctype="multipart/form-data" novalidate>
+            {{ form.hidden_tag() }}
+            <div>
+              <p>
+                {{ form.name.label }}<br>
+                {{ form.name(class_='form-fields')}}<br>
+                {% for error in form.name.errors %}
+                <span class="validate-error">{{error}}</span>
+                {%endfor%}
+              </p>
+              <p>
+                {{ form.email.label }}<br>
+                {{ form.email(class_='form-fields') }}<br>
+                {% for error in form.email.errors %}
+                <span class="validate-error">{{error}}</span>
+                {%endfor%}
+              </p>
+              <p>
+                {{ form.password.label }}<br>
+                {{ form.password(class_='form-fields')}}<br>
+                {% for error in form.password.errors %}
+                <span class="validate-error"s>{{error}}</span>
+                {%endfor%}
+              </p>
+            </div>
+            <button style="width: 100%;border-radius: 10px;" type="submit" class="btn btn-primary">تائید</button>
+          </form>
+        </div>
       </div>
-    </div>
-  </div><br>
-{% endblock %}
+    </div><br>
+    {% endblock %}
+  </body>
