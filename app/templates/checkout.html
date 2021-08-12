@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% block header %}ثبت سفارش{% endblock %}
 {% block content %}
 <!-- left column -->
 <div class="checkout-left-column-container" >
@@ -19,27 +18,27 @@
     <div class="form-row" >
     <div class="form-group col-md-12">
         {{ form.name.label }}
-        {{ form.name(class_='add-form-fields')}}
+        {{ form.name(class_='form-fields')}}
     </div>
     </div>
     <div class="form-row">
     <div class="form-group col-md-12">
         {{ form.city.label }}
-        {{ form.city(class_='add-form-fields')}}
+        {{ form.city(class_='form-fields')}}
     </div>
     <div class="form-group col-md-12">
         {{ form.address.label }}
-        {{ form.address(class_='add-form-fields')}}
+        {{ form.address(class_='form-fields')}}
     </div>
     </div>
     <div class="form-row">
     <div class="form-group col-md-12">
         {{ form.phone.label }}
-        {{ form.phone(class_='add-form-fields')}}
+        {{ form.phone(class_='form-fields')}}
     </div>
     <div class="form-group col-md-12">
         {{ form.email.label }}
-        {{ form.email(class_='add-form-fields') }}<br>
+        {{ form.email(class_='form-fields') }}<br>
     </div>
     <div class="form-group col-md-12">
         <p>روش پرداخت: </p>
