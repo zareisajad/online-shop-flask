@@ -13,5 +13,6 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
 login.login_message = 'ابتدا وارد حساب کاربری شوید'
+login.login_message_category = 'info'
 
-from app import app, routes
+from app import app, routes, errors
