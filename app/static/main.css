@@ -18,18 +18,10 @@ th, td {
     border: 1px solid rgba(202, 202, 202, 0.705);
     border-collapse: collapse;
 }
-.info{
-  direction: rtl;
-  text-align: right;
-}
-
 .filter-buttons {
   width:100%;
   text-align: center;
 }
-
-
-
 /* Cart number label on navbar link */
 .cart-number-label {
   float: right;
@@ -37,6 +29,7 @@ th, td {
   font-weight: 400;
   font-size: 13px;
   background-color: #00c70d;
+  border-radius: 9px;
   -webkit-border-radius: 9px;
   -moz-border-radius: 9px;
   padding: 0 5px;
@@ -116,25 +109,25 @@ th, td {
   width: 70%;
 }
 /* login - register - add category forms  */
-.add-form {
+.form-container {
+  display: inline-block;
   text-align: right;
-  background-color: rgb(105, 105, 105);
-  padding: 15px;
-  background-color: #eeeeee7e;
-  box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.2);
-  border-radius: 0.3rem;
+  background-color: #ffffff;
+  border-radius:20px;
+  margin-top: 70px;
+  padding: 50px;
+  width: 500px;
+}
+.form-fields {
   width: 100%;
-}
-.add-form-fields {
-width: 100%;
-background: #FAFAFA;
-border-radius: 0.3rem;
-border: 1px solid #8b8b8b4b;
+  border-radius: 10px;
+  border: 1px solid #3838384b;
   outline: none;
+  padding: 2.5px;
 }
-.add-form-fields:focus {
-box-shadow: 0 0 5px #6ab7e0;
-border:1px solid #66a3c4;
+.form-fields:focus {
+  box-shadow: 0 0 5px #6ab7e0;
+  border:1px solid #66a3c4;
   list-style:none;
 }
 .total_amount {
@@ -147,7 +140,7 @@ border:1px solid #66a3c4;
     font-size: 17px;
     padding: 5px;
 }
-/* product details template*/
+/* product details template */
 .container {
   direction: rtl;
   text-align: right;
@@ -167,7 +160,6 @@ border:1px solid #66a3c4;
   width: 60%;
   margin-top: 30px;
 }
-
 /* main img */
 .product-main-img {
   width: 400px;
@@ -189,13 +181,11 @@ figure {
 	transform: scale(1);
 	-webkit-transition: .3s ease-in-out;
 	transition: .3s ease-in-out;
-  
 }
 .hover01 figure:hover img {
 	-webkit-transform: scale(1.3);
 	transform: scale(1.5);
 }
-
 .gallery-container {
   width: 90%;
   padding: 5px 7px 5px 0px;
@@ -207,7 +197,6 @@ figure {
   margin-bottom: 5px;
 }
 
-/* Product Description */
 .product-description {
   border-bottom: 1px solid #E1E8EE;
   margin-bottom: 20px;
@@ -244,7 +233,6 @@ figure {
   padding: 12px 30px;
   transition: all .5s;
 }
-/* Responsive */
 @media (max-width: 940px) {
   .container {
     flex-direction: column;
@@ -267,50 +255,7 @@ figure {
     top: -85px;
   }
 }
-
-
-
-
-
-.hero-image {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("hero.jpeg");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  position: relative;
-  padding: 30px;
-  margin-bottom: 30px;
-}
-.hero-text {
-  margin-top: 5px;
-  text-align: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-}
-.nothing {
-  background-color: red;
-  color: #000000;
-  width: 15%;
-  padding: 5px;
-  border-radius: 4px;
-  text-align: center;
-}
-.minmax-form-fields{
-  width: 100%;
-  background: #FAFAFA;
-  border-radius: 0.3rem;
-  border: 1px solid #8b8b8b4b;
-  outline: none;
-  width: 80px;
-}
-.minmax-form-fields:focus{
-  box-shadow: 0 0 5px #6ab7e0;
-  border:1px solid #66a3c4;
-    list-style:none;
-}
+/* order line */
 .user-info {
    margin: auto;
    width: 80%;
@@ -318,7 +263,6 @@ figure {
    text-align: right;
 }
 /* checkout page */
-
 .checkout-form {
   width:40%;
   float:right;
@@ -346,5 +290,33 @@ figure {
   padding:5px;
   border-radius:5px;
   margin-top:25px;
-
+}
+/* errors template */
+#main{
+  display: table;
+  width: 100%;
+  height: 90vh;
+  text-align: center;
+}
+.fof{
+  display: table-cell;
+  vertical-align: middle;
+}
+.fof h1{
+    font-family:'Lato', sans-serif;
+    direction: rtl;
+  font-size: 70px;
+  display: inline-block;
+  padding-right: 12px;
+  animation: type .5s alternate infinite;
+    margin-bottom: 20px;
+}
+@keyframes type{
+  from{box-shadow: inset -3px 0px 0px #888;}
+  to{box-shadow: inset -3px 0px 0px transparent;}
+}
+/* validation error message forms */
+.validate-error {
+  color: rgba(212, 6, 6, 0.829);
+  font-size: 14px;"
 }
