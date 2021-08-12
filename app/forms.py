@@ -45,7 +45,7 @@ class FilterProductsForm(FlaskForm):
 
 class RegisterationForm(FlaskForm):
     name = StringField(
-        'نام:', validators=[DataRequired(
+        ' نام و نام خانوادگی:', validators=[DataRequired(
         message='لطفا نام خود را وارد کنید')])
     email = StringField(
         'ایمیل:', validators=[DataRequired(message='لطفا ایمیل خود را وارد کنید'),
