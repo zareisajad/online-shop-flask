@@ -77,3 +77,9 @@ class CheckoutForm(FlaskForm):
     email = StringField('ایمیل:', validators=[DataRequired()])
     payment = RadioField('Label', choices=[('آنلاین'),('نقدی')])
     submit = SubmitField('ثبت شفارش')
+
+
+class CommentSectionForm(FlaskForm):
+    name = StringField('نام:', validators=[DataRequired(message='لطفا نام خود را وارد کنید')])
+    email = StringField('ایمیل:', validators=[DataRequired(message='لطفا ایمیل خود را وارد کنید')])
+    comment = TextAreaField('دیدگاه:', validators=[DataRequired(message='لطفا دیدگاه خود را بنویسید')])
