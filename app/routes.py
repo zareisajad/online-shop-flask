@@ -11,9 +11,9 @@ from werkzeug.utils import secure_filename
 from werkzeug.urls import url_parse
 
 from app import app, db
-from app.models import Products, Cart, Gallery, Category, User, Orders
+from app.models import Products, Cart, Gallery, Category, User, Orders, Comments
 from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm,\
-                      RegisterationForm, LoginForm, CheckoutForm
+                      RegisterationForm, LoginForm, CheckoutForm, CommentSectionForm
 
 
 def login_required_role(role="ANY"):
@@ -219,12 +219,31 @@ def product_detail(id):
     Products Details
     ---------------
     """
+    form = CommentSectionForm()
     product = Products.query.filter_by(id=id).first()
     gallery = Gallery.query.all()
-    category = Category.query.filter_by(id=product.category_id).first()
     return render_template(
         'product_detail.html', product=product,
-         gallery=gallery, category=category, title=product.title)
+         gallery=gallery,title=product.title, form=form, JalaliDateTime=JalaliDateTime)
+
+
+@app.route('/comment<int:id>', methods=['GET', 'POST'])
+def comments(id):
+    form = CommentSectionForm()
+    if form.validate_on_submit():
+        comment = Comments(
+            name=form.name.data,
+            email=form.email.data,
+            comment=form.comment.data,
+            create_date=datetime.datetime.now(),
+            product_id=id
+            )
+        db.session.add(comment)
+        flash('نظر شما ثبت شد و در انتظار تائید است', category='success')
+    db.session.commit()
+    return redirect(url_for('product_detail', id=id))
+
+    
 
 
 @app.route('/cart/<int:id>', methods=['POST','GET'])
