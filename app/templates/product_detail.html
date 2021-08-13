@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
-<body>
-  <main class="container">
+<body style="background: #f0f2f5;"  >
+  <main class="container" style="background-color: rgb(255, 255, 255);border-radius: 20px;padding: 10px 20px 10px 0px;">
     <!-- right Column / Image and gallery -->
-    <div class="left-column">
+    <div class="left-column" >
       <div class="container1">
         <!-- main image -->
         <div class="hover01 column" >
@@ -15,46 +15,42 @@
         </div>
       </div>
       <div class="gallery-container">
-      <img src="{{product.photo}}" class="gallery-images" onclick="myFunction(this);">
-      {% for i in gallery %}
-      {% if i.p_id == product.id %}
-      <img src="{{i.pics}}" class="gallery-images" onclick="myFunction(this);">
-      {% endif %}
-      {% endfor %}
+        <img src="{{product.photo}}" class="gallery-images" onclick="myFunction(this);">
+        {% for i in gallery %}
+        {% if i.p_id == product.id %}
+        <img src="{{i.pics}}" class="gallery-images" onclick="myFunction(this);">
+        {% endif %}
+        {% endfor %}
       </div>
     </div>
-    </div>
-    <!-- left Column -->
-    <div class="right-column">
-      <div class="product-description">
-        <h1>{{product.title}}</h1>
-        <p>دسته بندی: {{category.name}}</p>
+  </div>
+  <!-- left Column -->
+  <div class="right-column" style="background-color: rgb(255, 255, 255);border-radius: 20px;margin-top: 18px;">
+      <h2>{{product.title}}</h2>
+      <!-- Product Pricing -->
+      <div class="product-price" >
+        {% if product.discounted %}
+        <span style="color: rgb(8, 75, 199);font-size: 23px;"><b>{{'{0:,}'.format(product.discounted | int)}} تومان</b></span>
+        <span style="color: rgb(105, 105, 105);"><b><del>{{'{0:,}'.format(product.price | int)}} تومان</del></b></span>
+        {% else %}
+        <p style="color: rgb(8, 75, 199);font-size: 23px;" ><b>{{'{0:,}'.format(product.price | int)}} تومان</b></p>
+        {% endif %}
+      </div>
+      <div style="color: rgb(97, 97, 97);">
+        <p>دسته بندی: {{product.category}}</p>
         <p>موجودی : {{product.inventory}} عدد</p>
         <p> امتیاز محصول : {{product.rate}} امتیاز</p>
+      </div>
         <!-- product rate icons -->
-      <p>به این محصول امتیاز دهید:</p>
         <a href="{{ url_for('reduce_rate', id=product.id) }}">
         <span style="font-size: 20px;"class="material-icons">&#xe8db;</span></a>
         <a href="{{ url_for('add_rate', id=product.id) }}">
         <span style="font-size: 20px;"class="material-icons">&#xe8dc;</span></a>
-        <!-- short description -->
-        <p>{{product.short_desc}}</p>
-      </div>
-      <!-- Product Pricing -->
-      <div class="product-price">
+      <div style="margin-top: 50px;margin-bottom: 60px;">
         {% if product.inventory == 0 %}
         <span style="color:red;">موجود نیست</span>
         {% else %}
-        {% if product.discounted %}
-        <span><b><del>{{'{0:,}'.format(product.price | int)}} تومان</del></b></span>
-        &nbsp; &nbsp;
-        <span><b>{{'{0:,}'.format(product.discounted | int)}} تومان</b></span>
-        {% else %}
-        <span><b>{{'{0:,}'.format(product.price | int)}} تومان</b></span>
         {% endif %}
-        {% endif %}
-        &nbsp; &nbsp;
-        &nbsp; &nbsp;
         {% if current_user.is_authenticated %}
         {% if product.inventory != 0 %}
         <form action="{{ url_for('cart', id=product.id) }}" method="POST">
@@ -68,10 +64,68 @@
         {%endif%}
       </div>
       <hr>
-      <!-- long description -->
-      <p style="color: rgb(92, 92, 92);">{{product.desc}}</p>
-      </div>
-    </main>
+      <!-- short description -->
+      <p style="margin-bottom:10px;">مشخصات محصول :‌</p>
+      <p style="font-size: 14px;color: rgb(97, 97, 97);">
+        {{product.short_desc}}
+      </p>
+    </div>
+  </main>
+  <div style="text-align: right;width: 1200px;margin: auto;background-color: white;padding:20px;border-radius: 20px;margin-top: 20px;">
+    <!-- long description -->
+    <h4 style="margin-bottom:10px;">درباره محصول :‌</h4>
+    <p style="font-size: 14px;color: rgb(97, 97, 97);">{{product.desc}}</p>
+
+  </div>
+  <div style="text-align: right;width: 1200px;margin: auto;background-color: white;padding:20px;border-radius: 20px;margin-top: 20px;">
+    {% if not product.comments %}
+    <h3 style="margin-bottom:30px;">نظرات کاربران</h3>
+    <p>0 دیدگاه</p>
+    <p>اولین نفری باشید که دیدگاهی مینویسد...</p>
+    {%else%}
+    {% for i in product.comments %}
+    <span style="font-size: 15px;"><b> {{i.name}} گفت : </b><i style="color: rgba(255, 0, 0, 0.686);font-size: 13px;">{{ JalaliDateTime(i.create_date).strftime('%Y/%m/%d -  %H:%M') }}</i></span>
+    <p style="font-size: 15px;">
+      {{i.comment}}
+    </p>
+    <hr>
+    {% endfor %}
+    {%endif%}
+  </div>
+
+  <!-- comment form section -->
+  <div style="text-align: right;width: 1200px;margin: auto;background-color: white;padding:20px;border-radius: 20px;margin-top:20px;">
+
+    <div class="comment-form-container" style="text-align: right;">
+      <h3 style="margin-bottom:30px;">دیدگاهتان را بنویسید</h3>
+      <form style="padding-left: 550px;" action="{{url_for('comments', id=product.id)}}" method="POST" enctype="multipart/form-data">
+        {{form.hidden_tag()}}
+        <p>
+          {{ form.name.label }}<br>
+          {{ form.name(class_='form-fields')}}<br>
+          {% for error in form.name.errors %}
+          <span class="validate-error">{{error}}</span>
+          {%endfor%}
+        </p>
+        <p>
+          {{ form.email.label }}<br>
+          {{ form.email(class_='form-fields') }}<br>
+          {% for error in form.email.errors %}
+          <span class="validate-error">{{error}}</span>
+          {%endfor%}
+        </p>
+        <p>
+          {{ form.comment.label }}<br>
+          {{ form.comment(class_='form-fields') }}<br>
+          {% for error in form.comment.errors %}
+          <span class="validate-error">{{error}}</span>
+          {%endfor%}
+        </p>
+        <button style="width: 10%;border-radius: 10px;margin-bottom: 20px;" type="submit" class="btn btn-primary">ارسال</button>
+    </form>
+  </div>
+</div>
+  <!-- show all comments -->
   <script>
     function myFunction(imgs) {
     var expandImg = document.getElementById("expandedImg");
