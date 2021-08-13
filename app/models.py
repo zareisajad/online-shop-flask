@@ -19,6 +19,7 @@ class Products(db.Model):
     gallery = db.relationship('Gallery', backref='gallery', lazy='dynamic')
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('Category', backref='category')
+    comments = db.relationship('Comments', backref='comments')
 
 
 class User(db.Model, UserMixin):
@@ -53,11 +54,9 @@ class Cart(db.Model):
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     orders_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
     start_payment_date = db.Column(db.DateTime)
     create_order_date = db.Column(db.DateTime)
     finish_payment_date = db.Column(db.DateTime)
-
     status = db.Column(db.String)
     payment_method = db.Column(db.String)
     name = db.Column(db.String)
@@ -83,6 +82,15 @@ class Gallery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     pics = db.Column(db.String(264))
     p_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+
+
+class Comments(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = name = db.Column(db.String(50))
+    email = db.Column(db.String)
+    comment = db.Column(db.String(200))
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    create_date = db.Column(db.DateTime)
 
 
 @login.user_loader
