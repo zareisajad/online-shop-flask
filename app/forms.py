@@ -22,7 +22,7 @@ class AddProductForm(FlaskForm):
     discounted = StringField('قیمت تخفیف خورده:')
     inventory = StringField('موجودی:', validators=[DataRequired()])
     category = QuerySelectField('انتخاب دسته بندی:',
-        query_factory=enabled_categories, allow_blank=True, validators=[DataRequired()])
+        query_factory=enabled_categories, allow_blank=False, validators=[DataRequired()])
     photos = MultipleFileField(
         'تصاویر گالری محصول:',validators=[FileAllowed(
         ['jpg', 'png', 'gif', 'jpeg'], 'Images only!'),
