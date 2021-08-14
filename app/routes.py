@@ -4,7 +4,7 @@ import datetime
 from functools import wraps
 
 from persiantools.jdatetime import JalaliDateTime
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, abort
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import desc, asc
 from werkzeug.utils import secure_filename
@@ -21,12 +21,19 @@ def login_required_role(role="ANY"):
         @wraps(fn)
         def decorated_view(*args, **kwargs):
             if not current_user.is_authenticated:
-              return login.unauthorized()
+                abort(404)
             if ((current_user.role != role) and (role != "ANY")):
-                return login.unauthorized()
+                abort(404)
             return fn(*args, **kwargs)
         return decorated_view
     return wrapper
+
+# pass category to (base.html) template to show in dropdown menu navbar
+@app.context_processor
+def pass_category():
+    # show all categories that has any products in it 
+    c = Category.query.filter(Category.id==Products.category_id).all()
+    return dict(category=c)
 
 
 # executes before any tasks
@@ -134,6 +141,10 @@ def add_product():
             filename = secure_filename(uploaded_file.filename)
             uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], filename))
             url = (os.path.join('static/images', filename))
+            if form.discounted.data:
+                if form.discounted.data >= form.price.data:
+                    flash('قیمت تخفیف خورده باید از قیمت اصلی کمتر باشد', category='warning')
+                    return redirect(url_for('add_product'))
             p = Products(
                 title=form.title.data, price=form.price.data,
                 discounted=form.discounted.data, sold=0, rate=0,
@@ -228,6 +239,7 @@ def product_detail(id):
 
 
 @app.route('/comment<int:id>', methods=['GET', 'POST'])
+@login_required
 def comments(id):
     form = CommentSectionForm()
     if form.validate_on_submit():
@@ -537,6 +549,16 @@ def newst():
     keyword.sort(key=lambda i: i.date, reverse=True)
     return render_template('filter_result.html', keyword=keyword)
 """
+
+@app.route('/category=<name>', methods=['POST', 'GET'])
+def filter_by_category(name):
+    keyword = []
+    for i in Products.query.all():
+        if i.category.name == name:
+            keyword.append(i)
+    if not keyword:
+        flash('محصولی موجود نیست')
+    return render_template('keyword.html', keyword=keyword)
 
 
 @app.route('/popular', methods=['POST', 'GET'])
