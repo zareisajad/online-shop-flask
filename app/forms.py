@@ -25,8 +25,8 @@ class AddProductForm(FlaskForm):
         query_factory=enabled_categories, allow_blank=False, validators=[DataRequired()])
     photos = MultipleFileField(
         'تصاویر گالری محصول:',validators=[FileAllowed(
-        ['jpg', 'png', 'gif', 'jpeg'], 'Images only!'),
-        Length(min=1 , max=5, message="آپلود بیشتر از ۵ فایل مجاز نیست")] )
+          ['jpg', 'png', 'gif', 'jpeg'], 'Images only!'),
+          Length(min=1 , max=5, message="آپلود بیشتر از ۵ فایل مجاز نیست")] )
     submit = SubmitField('Publish')
 
 
@@ -75,7 +75,7 @@ class CheckoutForm(FlaskForm):
     address =  TextField('آدرس کامل:', validators=[DataRequired()])
     phone =  StringField('شماره تماس:', validators=[DataRequired()])
     email = StringField('ایمیل:', validators=[DataRequired()])
-    payment = RadioField('Label', choices=[('آنلاین'),('نقدی')])
+    payment = RadioField('Label', choices=['آنلاین', 'نقدی'])
     submit = SubmitField('ثبت شفارش')
 
 

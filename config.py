@@ -18,9 +18,4 @@ class Config(object):
     # Upload paths
     UPLOAD_PATH = os.path.join('app/static/images')
     UPLOAD_GALLERY = os.path.join('app/static/gallery')
-    # Flask-User settings
-    USER_APP_NAME = "بازدید سایت"
-    USER_ENABLE_EMAIL = True # Enable email authentication
-    USER_ENABLE_USERNAME = False # Disable username authentication
-    USER_EMAIL_SENDER_NAME = USER_APP_NAME
-    USER_EMAIL_SENDER_EMAIL = "noreply@example.com"
+

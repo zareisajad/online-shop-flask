@@ -11,7 +11,8 @@ from werkzeug.utils import secure_filename
 from werkzeug.urls import url_parse
 
 from app import app, db
-from app.models import Products, Cart, Gallery, Category, User, Orders, Comments
+from app.models import Products, Cart, Gallery, Category,\
+    User, Orders, Comments
 from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm,\
                       RegisterationForm, LoginForm, CheckoutForm, CommentSectionForm
 
@@ -27,6 +28,7 @@ def login_required_role(role="ANY"):
             return fn(*args, **kwargs)
         return decorated_view
     return wrapper
+
 
 # pass category to (base.html) template to show in dropdown menu navbar
 @app.context_processor
@@ -180,9 +182,8 @@ def add_category():
         flash('دسته بندی جدید ایجاد شد', category='info')
         return redirect(url_for('add_product'))
     category = Category.query.all()
-    return render_template(
-        'add_category.html', form=form, category=category,
-         title='ایجاد دسته بندی جدید')
+    return render_template('add_category.html', form=form,
+                           category=category, title='ایجاد دسته بندی جدید')
 
 
 @app.route('/manage', methods=['POST', 'GET'])
@@ -233,9 +234,9 @@ def product_detail(id):
     form = CommentSectionForm()
     product = Products.query.filter_by(id=id).first()
     gallery = Gallery.query.all()
-    return render_template(
-        'product_detail.html', product=product,
-         gallery=gallery,title=product.title, form=form, JalaliDateTime=JalaliDateTime)
+    return render_template('product_detail.html', product=product,
+                           gallery=gallery, title=product.title, form=form,
+                           JalaliDateTime=JalaliDateTime)
 
 
 @app.route('/comment<int:id>', methods=['GET', 'POST'])
@@ -288,7 +289,7 @@ def cart(id):
     return redirect(url_for('main_page'))
 
 
-@app.route('/user-<int:id>', methods=['POST','GET'])
+@app.route('/user-<int:id>', methods=['POST', 'GET'])
 @login_required
 def show_cart(id):
     """
@@ -366,7 +367,8 @@ def checkout():
     p = [
         Products.query.filter(
         Products.id == i.product_id).first() for i in c]
-    return render_template('checkout.html', c=c, p=p, form=form, zip=zip, title='ثبت سفارش')
+    return render_template('checkout.html', c=c, p=p, form=form,
+                           zip=zip, title='ثبت سفارش')
 
 
 @app.route('/user-payment', methods=['POST','GET'])
@@ -505,50 +507,6 @@ def filter_products():
     form = FilterProductsForm()
     return render_template('filter.html', form=form)
 
-
-"""
-@app.route('/f', methods=['POST', 'GET'])
-def filter():
-    form = FilterProductsForm()
-    global keyword
-    keyword = Products.query.filter(
-        Products.title.contains(form.keyword.data),
-        Products.category == form.category.data,
-        Products.price > form.min_price.data,
-        Products.price < form.max_price.data
-        ).order_by(asc(Products.price)).all()
-    return render_template('filter_result.html', keyword=keyword)
-
-
-@app.route('/popular-filter', methods=['POST', 'GET'])
-def popular():
-    keyword.sort(key=lambda i: i.rate, reverse=True)
-    return render_template('filter_result.html', keyword=keyword)
-
-
-@app.route('/sold-filter', methods=['POST', 'GET'])
-def sold():
-    keyword.sort(key=lambda i: i.sold, reverse=True)
-    return render_template('filter_result.html', keyword=keyword)
-
-
-@app.route('/expensive_filter', methods=['POST', 'GET'])
-def expensive():
-    keyword.sort(key=lambda i: i.price, reverse=True)
-    return render_template('filter_result.html', keyword=keyword)
-
-
-@app.route('/cheapest-filter', methods=['POST', 'GET'])
-def cheapest():
-    keyword.sort(key=lambda i: i.price)
-    return render_template('filter_result.html', keyword=keyword)
-
-
-@app.route('/newst-filter', methods=['POST', 'GET'])
-def newst():
-    keyword.sort(key=lambda i: i.date, reverse=True)
-    return render_template('filter_result.html', keyword=keyword)
-"""
 
 @app.route('/category=<name>', methods=['POST', 'GET'])
 def filter_by_category(name):
