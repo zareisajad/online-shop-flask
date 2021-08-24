@@ -13,7 +13,7 @@
     {% for pic in products %}
     <tr>
       <td>
-        <a name='delete' href="{{url_for('delete', id=pic.id)}}" class="btn btn-danger"> حذف </a>
+        <a name='delete' href="{{url_for('delete', product_id=pic.id)}}" class="btn btn-danger"> حذف </a>
       </td>
       <td style="text-align: right;">
         <img class="card-img-top" src="{{pic.photo}}" style="width: 70px; height: 70px;">

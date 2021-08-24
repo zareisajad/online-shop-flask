@@ -13,7 +13,7 @@
     <span class="checkout-left-column-price">مبلغ کل: <b>{{'{0:,}'.format(c[-1].total | int)}}</b> تومان</span>
 </div>
 <!-- user information form -->
-<form method="POST" enctype="multipart/form-data" action="/user-payment" class="checkout-form">
+<form method="POST" enctype="multipart/form-data" action="/payment" class="checkout-form">
     {{ form.hidden_tag() }}
     <div class="form-row" >
     <div class="form-group col-md-12">

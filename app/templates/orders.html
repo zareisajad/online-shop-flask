@@ -10,7 +10,7 @@
     </tr>
     {% for i,o in zip(users,orders) %}
     <tr>
-        <td><a href="{{ url_for('order_line', id=o.orders_id) }}">{{i.name}}</a></td>
+        <td><a href="{{ url_for('order_line', order_id=o.orders_id) }}">{{i.name}}</a></td>
         {% if o.status == 'در انتظار پرداخت' %}
         <td><span style="color:orange;">{{o.status}}</span></td>
         {% endif %}

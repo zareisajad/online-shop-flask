@@ -18,7 +18,7 @@
       </td>
       <td style="text-align: right;">
         <img class="card-img-top" src="{{i.photo}}" style="width:80px;height:80px;padding:5px;">
-        <a href="{{url_for('product_detail', id=i.id)}}">
+        <a href="{{url_for('product_detail', product_id=i.id)}}">
           <span style="padding:10px">{{i.title}}</span>
         </a>
       </td>
@@ -28,9 +28,9 @@
       <td>{{ '{0:,}'.format(i.discounted) }} تومان</td>
       {% endif %}
       <td>
-        <a href="{{url_for('add_num', id=i.id)}}" class="btn btn-primary" >+</a>
+        <a href="{{url_for('add_num', product_id=i.id)}}" class="btn btn-primary" >+</a>
         {{ a.number }} عدد
-        <a href="{{url_for('reduce_num', id=i.id)}}" class="btn btn-primary" >-</a>
+        <a href="{{url_for('reduce_num', product_id=i.id)}}" class="btn btn-primary" >-</a>
       </td>
       <td>
         {% if not i.discounted %}

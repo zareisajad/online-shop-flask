@@ -42,7 +42,7 @@
     <a style="padding: 3px;" href="{{url_for('cart', id=p.id)}}" class="btn btn-primary">
       <i style="padding: 5px;" class="material-icons">&#xe854;</i></a>
     <!-- details button -->
-    <a href="{{url_for('product_detail', id=p.id)}}" class="btn btn-primary" style="padding: 9px;">مشاهده</a>
+    <a href="{{url_for('product_detail', product_id=p.id)}}" class="btn btn-primary" style="padding: 9px;">مشاهده</a>
   </div>
 </div>
 {% endfor %}

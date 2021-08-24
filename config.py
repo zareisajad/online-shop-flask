@@ -2,6 +2,7 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+
 class Config(object):
     """
     Flask application config
@@ -14,7 +15,7 @@ class Config(object):
         'sqlite:///' + os.path.join(basedir, 'app.db') #File-based SQL database
     SQLALCHEMY_TRACK_MODIFICATIONS = False # Avoids SQLAlchemy warning
     # set size limit for upload files
-    MAX_CONTENT_LENGTH = 5 * 1000 * 1000
+    MAX_CONTENT_LENGTH = 3 * 1000 * 1000
     # Upload paths
     UPLOAD_PATH = os.path.join('app/static/images')
     UPLOAD_GALLERY = os.path.join('app/static/gallery')
