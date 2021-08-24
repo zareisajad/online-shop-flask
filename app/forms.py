@@ -1,10 +1,11 @@
-from wtforms import StringField, SubmitField, MultipleFileField,\
-                    PasswordField, TextField, RadioField
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Length, Email, ValidationError
-from flask_wtf.file import FileField, FileRequired, FileAllowed
-from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, MultipleFileField, \
+    PasswordField, TextField, RadioField
+
 from app.models import Category, User
 
 
@@ -13,8 +14,9 @@ def enabled_categories():
 
 
 class AddProductForm(FlaskForm):
-    photo = FileField('تصویر شاخص:',validators=[FileRequired(),
-        FileAllowed(['jpg', 'png', 'gif', 'jpeg'], 'Images only!')])
+    photo = FileField(
+        'تصویر شاخص:',
+        validators=[FileRequired(),FileAllowed(['jpg', 'png', 'jpeg'])])
     title = StringField('عنوان محصول:', validators=[DataRequired()])
     short_desc = TextAreaField('توضیح کوتاه:', validators=[DataRequired()])
     desc = TextAreaField('توضیحات:', validators=[DataRequired()])
@@ -33,14 +35,6 @@ class AddProductForm(FlaskForm):
 class AddCategoryForm(FlaskForm):
     name = StringField('نام دسته بندی', validators=[DataRequired()])
     submit = SubmitField('ذخیره')
-
-
-class FilterProductsForm(FlaskForm):
-    keyword = StringField('کلمه کلیدی:')
-    category = QuerySelectField(
-        'دسته بندی:',query_factory=enabled_categories, allow_blank=True)
-    min_price = StringField('از:')
-    max_price = StringField('تا')
 
 
 class RegisterationForm(FlaskForm):
