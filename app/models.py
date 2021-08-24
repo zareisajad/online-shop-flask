@@ -18,7 +18,6 @@ class Products(db.Model):
     rate = db.Column(db.Integer)
     gallery = db.relationship('Gallery', backref='gallery', lazy='dynamic')
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    category = db.relationship('Category', backref='category')
     comments = db.relationship('Comments', backref='comments')
 
 
