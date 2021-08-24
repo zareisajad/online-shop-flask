@@ -17,7 +17,7 @@
         <i class="material-icons" style="color:red">remove_circle</i></a>
       </td>
       <td style="text-align: right;">
-        <img class="card-img-top" src="{{i.photo}}" style="width:80px;height:80px;padding:5px;">
+        <img class="card-img-top" src="{{ url_for('static', filename=i.photo)}}" style="width:80px;height:80px;padding:5px;">
         <a href="{{url_for('product_detail', product_id=i.id)}}">
           <span style="padding:10px">{{i.title}}</span>
         </a>

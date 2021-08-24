@@ -5,7 +5,7 @@
     <h4 style="text-align: center;">سفارش شما</h4>
     {% for i,p in zip(p,c) %}
     <hr>
-    <img src="{{i.photo}}" class="checkout-left-column-img">
+    <img src="{{ url_for('static', filename=i.photo)}}" class="checkout-left-column-img">
     <span style="float: right;"><b>{{p.number}} x</b> {{i.title}} </span>
     <b>{{'{0:,}'.format(p.amount | int)}}</b> تومان
     {% endfor %}

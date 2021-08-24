@@ -9,16 +9,16 @@
         <div class="hover01 column" >
           <div >
             <figure>
-              <img src="{{product.photo}}" class="product-main-img" id="expandedImg">
+              <img src="{{ url_for('static', filename=product.photo)}}" class="product-main-img" id="expandedImg">
             </figure>
           </div>
         </div>
       </div>
       <div class="gallery-container">
-        <img src="{{product.photo}}" class="gallery-images" onclick="myFunction(this);">
+        <img src="{{ url_for('static', filename=product.photo)}}" class="gallery-images" onclick="myFunction(this);">
         {% for i in gallery %}
         {% if i.p_id == product.id %}
-        <img src="{{i.pics}}" class="gallery-images" onclick="myFunction(this);">
+        <img src="{{ url_for('static', filename=i.pics)}}" class="gallery-images" onclick="myFunction(this);">
         {% endif %}
         {% endfor %}
       </div>
@@ -42,9 +42,9 @@
         <p> امتیاز محصول : {{product.rate}} امتیاز</p>
       </div>
         <!-- product rate icons -->
-        <a href="{{ url_for('reduce_rate', id=product.id) }}">
+        <a href="{{ url_for('product_rate', product_id=product.id, name='reduce') }}">
         <span style="font-size: 20px;"class="material-icons">&#xe8db;</span></a>
-        <a href="{{ url_for('add_rate', id=product.id) }}">
+        <a href="{{ url_for('product_rate', product_id=product.id, name='add') }}">
         <span style="font-size: 20px;"class="material-icons">&#xe8dc;</span></a>
       <div style="margin-top: 50px;margin-bottom: 60px;">
         {% if product.inventory == 0 %}

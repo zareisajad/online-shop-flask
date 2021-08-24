@@ -16,7 +16,7 @@
         <a name='delete' href="{{url_for('delete', product_id=pic.id)}}" class="btn btn-danger"> حذف </a>
       </td>
       <td style="text-align: right;">
-        <img class="card-img-top" src="{{pic.photo}}" style="width: 70px; height: 70px;">
+        <img class="card-img-top" src="{{ url_for('static', filename=pic.photo)}}" style="width: 70px; height: 70px;">
         <span style="padding:10px">{{pic.title}}</span>
       </td>
       <td>{{ '{0:,}'.format(pic.price | int) }} تومان</td>

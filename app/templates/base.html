@@ -24,7 +24,7 @@
         <!-- categories dropdown -->
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           {% for i in category %}
-          <a class="dropdown-item" href="{{ url_for('filter_by_category', name=i.name) }}">{{i.name}}</a>
+          <a class="dropdown-item" href="{{ url_for('filter_by_category', category_id=i.id) }}">{{i.name}}</a>
           {% endfor %}
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="#">همه محصولات</a>
@@ -68,4 +68,5 @@
   {% endwith %}
 </section>
 </body>
+
 </html>

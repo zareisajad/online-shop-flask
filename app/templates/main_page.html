@@ -6,25 +6,25 @@
 <div class="filter-buttons">
   <form method="get">
     <button class="btn btn-primary" type="submit"
-    formaction="{{url_for('popular_filter')}}">محبوبترین
+    formaction="{{url_for('filter_by_property', filter_name='محبوبترین')}}">محبوبترین
     </button>
     <button class="btn btn-primary" type="submit"
-    formaction="{{url_for('sold_filter')}}">پر فروشترین
+    formaction="{{url_for('filter_by_property', filter_name='پرفروشترین')}}">پرفروشترین
     </button>
     <button class="btn btn-primary" type="submit"
-    formaction="{{url_for('expensive_filter')}}">گرانترین
+    formaction="{{url_for('filter_by_property', filter_name='گرانترین')}}">گرانترین
     </button>
     <button class="btn btn-primary" type="submit"
-    formaction="{{url_for('cheapest_filter')}}">ارزانترین
+    formaction="{{url_for('filter_by_property', filter_name='ارزانترین')}}">ارزانترین
     </button>
     <button class="btn btn-primary" type="submit"
-    formaction="{{url_for('newst_filter')}}">جدیدترین
+    formaction="{{url_for('filter_by_property', filter_name='جدیدترین')}}">جدیدترین
     </button>
-
+  </form>
 </div>
-{% for p in all_products %}
+{% for p in all_products.items %}
 <div class="card" style="width: 18rem;margin-bottom:10px;">
-  <img class="img-card" src="{{p.photo}}">
+  <img class="img-card" src="{{ url_for('static', filename=p.photo)}}">
   <div class="card-body">
     <h5 class="card-title">{{p.title}}</h5>
     {% if p.inventory == 0 %}
@@ -48,5 +48,21 @@
 {% endfor %}
 {% endif %}
 </body>
-{% endblock %}
 </div>
+<div style="text-align:center;direction:ltr;margin-top:20px;margin-bottom:20px;">
+{% for page_num in all_products.iter_pages() %}
+    {% if page_num %}
+      {% if all_products.page == page_num %}
+        <a class="btn btn-primary" href="{{ url_for('main_page', page=page_num) }}" >{{page_num}}</a>
+      {% else %}
+        <a class="btn btn-outline-primary" href="{{ url_for('main_page', page=page_num) }}">{{page_num}}</a>
+      {% endif %}
+    {% else %}
+    {% endif %}
+{% endfor %}
+</div>
+
+{% endblock %}
+
+
+
