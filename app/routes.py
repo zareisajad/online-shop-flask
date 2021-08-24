@@ -13,7 +13,7 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.models import Products, Cart, Gallery, Category, \
     User, Orders, Comments
-from app.forms import AddProductForm, AddCategoryForm, FilterProductsForm, \
+from app.forms import AddProductForm, AddCategoryForm, \
     RegisterationForm, LoginForm, CheckoutForm, CommentSectionForm
 
 
@@ -26,9 +26,7 @@ def login_required_role(role="ANY"):
             if current_user.role != role and role != "ANY":
                 abort(404)
             return fn(*args, **kwargs)
-
         return decorated_view
-
     return wrapper
 
 
@@ -107,7 +105,8 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('main_page')
         return redirect(next_page)
-    return render_template('login.html', form=form, title="ورود به حساب کاربری")
+    return render_template(
+        'login.html', form=form, title="ورود به حساب کاربری")
 
 
 @app.route('/logout')
@@ -124,8 +123,9 @@ def main_page():
     this page contains all the products cards.
     if there is no products then we flash a message.
     """
-    all_products = Products.query.all()
-    if not all_products:
+    page = request.args.get('page', 1, type=int)
+    all_products = Products.query.paginate(page=page, per_page=20)
+    if not all_products.items:
         flash('محصولی موجود نیست', category='info')
     return render_template(
         'main_page.html', all_products=all_products, title='محصولات')
@@ -147,19 +147,20 @@ def add_product():
             uploaded_file.save(
                 os.path.join(app.config['UPLOAD_PATH'], filename)
             )
-            url = (os.path.join('static/images', filename))
+            url = (os.path.join('/images', filename))
             p = Products(
                 title=form.title.data, price=form.price.data,
                 discounted=form.discounted.data, sold=0, rate=0,
                 short_desc=form.short_desc.data, desc=form.desc.data,
-                inventory=form.inventory.data, photo=url, category_id=c.id)
+                inventory=form.inventory.data, photo=url, category_id=c.id
+            )
             db.session.add(p)
             db.session.commit()
             images = form.photos.data
             for img in images:
                 filename = secure_filename(img.filename)
                 img.save(os.path.join(app.config['UPLOAD_GALLERY'], filename))
-                url = (os.path.join('static/gallery', filename))
+                url = (os.path.join('/gallery', filename))
                 files = Gallery(pics=url, p_id=p.id)
                 db.session.add(files)
             db.session.commit()
@@ -226,7 +227,7 @@ def delete(product_id):
     return redirect(url_for('manage_products'))
 
 
-@app.route('/product<int:product_id>', methods=['GET', 'POST'])
+@app.route('/product/<int:product_id>', methods=['GET', 'POST'])
 def product_detail(product_id):
     """
     Products Details
@@ -253,9 +254,9 @@ def comments(id):
             product_id=id
         )
         db.session.add(comment)
-        flash('نظر شما ثبت شد و در انتظار تائید است', category='success')
+        flash(' دیدگاه شما ثبت شد', category='success')
     db.session.commit()
-    return redirect(url_for('product_detail', id=id))
+    return redirect(url_for('product_detail', product_id=id))
 
 
 @app.route('/add/cart/<int:id>', methods=['POST', 'GET'])
@@ -274,6 +275,7 @@ def cart(id):
         Cart.product_id == id, Cart.cart_id == current_user.id).first()
     if ca:
         flash('این محصول قبلا اضافه شده است', category='danger')
+        return redirect(url_for('show_cart'))
     else:
         # number input in product detail page
         n = request.form.get('number')
@@ -505,51 +507,44 @@ def order_line(order_id):
         order=order, zip=zip, JalaliDateTime=JalaliDateTime, title='جزئیات سفارش')
 
 
-@app.route('/category=<name>', methods=['POST', 'GET'])
-def filter_by_category(name):
-    keyword = []
-    for i in Products.query.all():
-        if i.category.name == name:
-            keyword.append(i)
-    if not keyword:
-        flash('محصولی موجود نیست')
-    return render_template('keyword.html', keyword=keyword)
+@app.route('/filter/category/<category_id>', methods=['POST', 'GET'])
+def filter_by_category(category_id):
+    """
+    Filter products by category name
+    --------------------------------
+    """
+    page = request.args.get('page', 1, type=int)
+    all_products = Products.query.filter_by(
+        category_id=category_id).paginate(page=page, per_page=20)
+    return render_template(
+        'main_page.html', all_products=all_products)
 
 
-@app.route('/filter', methods=['POST', 'GET'])
-def filter_products():
-    form = FilterProductsForm()
-    return render_template('filter.html', form=form)
-
-
-@app.route('/popular', methods=['POST', 'GET'])
-def popular_filter():
-    keyword = Products.query.order_by(desc(Products.rate)).all()
-    return render_template('keyword.html', keyword=keyword)
-
-
-@app.route('/most-sold', methods=['POST', 'GET'])
-def sold_filter():
-    keyword = Products.query.order_by(desc(Products.sold)).all()
-    return render_template('keyword.html', keyword=keyword)
-
-
-@app.route('/expensive', methods=['POST', 'GET'])
-def expensive_filter():
-    keyword = Products.query.order_by(desc(Products.price)).all()
-    return render_template('keyword.html', keyword=keyword)
-
-
-@app.route('/cheapest', methods=['POST', 'GET'])
-def cheapest_filter():
-    keyword = Products.query.order_by(asc(Products.price)).all()
-    return render_template('keyword.html', keyword=keyword)
-
-
-@app.route('/new', methods=['POST', 'GET'])
-def newst_filter():
-    keyword = Products.query.order_by(desc(Products.date)).all()
-    return render_template('keyword.html', keyword=keyword)
+@app.route('/filter/property/<filter_name>', methods=['POST', 'GET'])
+def filter_by_property(filter_name):
+    """
+    Filter Products by properties:
+    ------------------------------
+    most rated, most expensive, cheapest, etc.
+    """
+    page = request.args.get('page', 1, type=int)
+    if filter_name == 'محبوبترین':
+        all_products = Products.query.order_by(
+            desc(Products.rate)).paginate(page=page, per_page=20)
+    if filter_name == 'پرفروشترین':
+        all_products = Products.query.order_by(
+            desc(Products.sold)).paginate(page=page, per_page=20)
+    if filter_name == 'گرانترین':
+        all_products = Products.query.order_by(
+            desc(Products.price)).paginate(page=page, per_page=20)
+    if filter_name == 'ارزانترین':
+        all_products = Products.query.order_by(
+            asc(Products.price)).paginate(page=page, per_page=20)
+    if filter_name == 'جدیدترین':
+        all_products = Products.query.order_by(
+            desc(Products.date)).paginate(page=page, per_page=20)
+    return render_template('main_page.html', all_products=all_products,
+                           title=f'فیلتر بر اساس {filter_name}')
 
 
 @app.route('/fa', methods=['GET', 'POST'])
@@ -574,27 +569,18 @@ def final_amount():
     return redirect(url_for('checkout'))
 
 
-@app.route('/like/<int:id>', methods=['POST', 'GET'])
-def add_rate(id):
+@app.route('/product/rate/<int:product_id>/<string:name>')
+def product_rate(product_id, name):
     """
     Add Products Rate
     ---------------
     """
-    p = Products.query.filter_by(id=id).first()
-    p.rate += 1
+    if name == 'add':
+        p = Products.query.filter_by(id=product_id).first()
+        p.rate += 1
+    if name == 'reduce':
+        p = Products.query.filter_by(id=product_id).first()
+        p.rate -= 1
     db.session.commit()
     flash('امتیاز ثبت شد', category='success')
-    return redirect(url_for('product_detail', id=id))
-
-
-@app.route('/dislike/<int:id>', methods=['POST', 'GET'])
-def reduce_rate(id):
-    """
-    Reduce Product Rate
-    ---------------
-    """
-    p = Products.query.filter_by(id=id).first()
-    p.rate -= 1
-    db.session.commit()
-    flash('امتیاز ثبت شد', category='success')
-    return redirect(url_for('product_detail', id=id))
+    return redirect(url_for('product_detail', product_id=product_id))
