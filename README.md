@@ -1,6 +1,6 @@
 # Online Shop Platform
 
-p.s : all the texts in this app written in #Persian
+p.s : all the texts in this app written in Persian
 
 as a user you can:
 - register and log in
