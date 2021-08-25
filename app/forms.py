@@ -63,6 +63,17 @@ class LoginForm(FlaskForm):
         Length(min=6, max=12, message='رمز عبور باید از ۶ تا ۱۲ کاراکتر طول داشته باشد')])
 
 
+class EditProfileForm(FlaskForm):
+    name = StringField('نام:', validators=[DataRequired()])
+    email = StringField('ایمیل:', validators=[DataRequired(),
+        Email(check_deliverability=True,message='ایمیل معتبر نیست')])
+    submit = SubmitField('ذخیره')
+
+    def __init__(self, original_email, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        self.original_email = original_email
+
+
 class CheckoutForm(FlaskForm):
     name = StringField('نام و نام خانوادگی:', validators=[DataRequired()])
     city =  StringField('شهر:', validators=[DataRequired()])

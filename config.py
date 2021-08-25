@@ -19,3 +19,4 @@ class Config(object):
     # Upload paths
     UPLOAD_PATH = os.path.join('app/static/images')
     UPLOAD_GALLERY = os.path.join('app/static/gallery')
+
