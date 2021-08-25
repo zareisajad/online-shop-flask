@@ -1,6 +1,8 @@
 from datetime import datetime
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+
 from app import db, login
 
 
@@ -29,7 +31,8 @@ class User(db.Model, UserMixin):
     cart = db.relationship('Cart', backref='cart')
     orders = db.relationship('Orders', backref='orders')
     role = db.Column(db.String())
-
+    profile = db.relationship('Profile', backref='profile')
+    
     def __repr__(self):
         return '<User {}>'.format(self.name)
 
@@ -38,6 +41,14 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
+
+
+class Profile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __repr__(self):
+        return f'profile {self.id}'
 
 
 class Cart(db.Model):
@@ -52,7 +63,7 @@ class Cart(db.Model):
 
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    orders_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     start_payment_date = db.Column(db.DateTime)
     create_order_date = db.Column(db.DateTime)
     finish_payment_date = db.Column(db.DateTime)
