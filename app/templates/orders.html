@@ -8,20 +8,20 @@
         <th>تاریخ ایجاد سفارش</th>
         <th>جمع کل</th>
     </tr>
-    {% for i,o in zip(users,orders) %}
+    {% for i in orders %}
     <tr>
-        <td><a href="{{ url_for('order_line', order_id=o.orders_id) }}">{{i.name}}</a></td>
-        {% if o.status == 'در انتظار پرداخت' %}
-        <td><span style="color:orange;">{{o.status}}</span></td>
+        <td><a href="{{ url_for('order_line', order_id=i.id) }}">{{i.name}}</a></td>
+        {% if i.status == 'در انتظار پرداخت' %}
+        <td><span style="color:orange;">{{i.status}}</span></td>
         {% endif %}
-        {% if o.status == 'کنسل شده' %}
-        <td><span style="color:red;">{{o.status}}</span></td>
+        {% if i.status == 'کنسل شده' %}
+        <td><span style="color:red;">{{i.status}}</span></td>
         {% endif %}
-        {% if o.status == 'پرداخت شده' %}
-        <td><span style="color:green;">{{o.status}}</span></td>
+        {% if i.status == 'پرداخت شده' %}
+        <td><span style="color:green;">{{i.status}}</span></td>
         {% endif %}
-        <td>{{ JalaliDateTime(o.create_order_date).strftime('%Y/%m/%d -  %H:%M:%S ') }}</td>
-        <td>{{'{0:,}'.format(o.total)}} تومان</td>
+        <td>{{ JalaliDateTime(i.create_order_date).strftime('%Y/%m/%d -  %H:%M:%S ') }}</td>
+        <td>{{'{0:,}'.format(i.total)}} تومان</td>
     </tr>
     {% endfor %}
   </table>

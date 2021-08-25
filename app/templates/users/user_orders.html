@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if orders %}
+<table >
+    <tr>
+        <th>سفارش</th>
+        <th>وضعیت</th>
+        <th>تاریخ ایجاد سفارش</th>
+        <th>جمع کل</th>
+    </tr>
+    {% for i in orders %}
+    <tr>
+        <td> <a href="{{ url_for('user_order_detail', order_id=i.id) }}"> {{current_user.name}}</a></td>
+        <td>{{i.status}}</td>
+        <td>{{ JalaliDateTime(i.create_order_date).strftime('%Y/%m/%d -  %H:%M:%S ') }}</td>
+        <td>{{'{0:,}'.format(i.total)}} تومان</td>
+    </tr>
+    {% endfor %}
+  </table>
+<br>
+{% endif %}
+{% endblock %}

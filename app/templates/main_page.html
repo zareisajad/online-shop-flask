@@ -49,6 +49,7 @@
 {% endif %}
 </body>
 </div>
+
 <div style="text-align:center;direction:ltr;margin-top:20px;margin-bottom:20px;">
 {% for page_num in all_products.iter_pages() %}
     {% if page_num %}
@@ -61,7 +62,6 @@
     {% endif %}
 {% endfor %}
 </div>
-
 {% endblock %}
 
 
