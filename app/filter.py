@@ -6,7 +6,15 @@ from flask import render_template, request
 from sqlalchemy import desc, asc
 
 from app import app
-from app.models import Products
+from app.models import Products, Category
+
+
+# pass category to (base.html) template to show in dropdown menu navbar
+@app.context_processor
+def pass_category():
+    # show all categories that has any products in it
+    c = Category.query.filter(Category.id == Products.category_id).all()
+    return dict(category=c)
 
 
 @app.route("/filter/category/<category_id>", methods=["POST", "GET"])
