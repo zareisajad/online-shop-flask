@@ -21,6 +21,7 @@ class Products(db.Model):
     gallery = db.relationship('Gallery', backref='gallery', lazy='dynamic')
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     comments = db.relationship('Comments', backref='comments')
+    favorite = db.relationship('Favorite', backref='products')
 
 
 class User(db.Model, UserMixin):
@@ -28,11 +29,12 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(120))
     email = db.Column(db.String(120), index=True, unique=True)
     password = db.Column(db.String(128))
+    role = db.Column(db.String())
     cart = db.relationship('Cart', backref='cart')
     orders = db.relationship('Orders', backref='orders')
-    role = db.Column(db.String())
     profile = db.relationship('Profile', backref='profile')
-    
+    favorite = db.relationship('Favorite', backref='favorites')
+
     def __repr__(self):
         return '<User {}>'.format(self.name)
 
@@ -49,6 +51,12 @@ class Profile(db.Model):
 
     def __repr__(self):
         return f'profile {self.id}'
+
+
+class Favorite(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
 
 
 class Cart(db.Model):
