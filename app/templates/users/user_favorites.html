@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if favorites %}
+<h3 style="text-align:center">علاقه مندی های شما</h3>
+<body style="text-align:right;">
+{% for i in favorites %}
+<div class="card" style="width: 18rem;margin-bottom:10px;">
+    <p>
+        <a href="{{ url_for('remove_favorite', product_id=i.products.id) }}">
+        <i style="color:red;font-size:35px;" class="material-icons">&#xe14c;</i>
+        </a>
+    </p>
+
+  <img class="img-card" src="{{ url_for('static', filename=i.products.photo)}}">
+  <div class="card-body">
+    <h5 class="card-title">{{i.products.title}}</h5>
+    {% if i.products.inventory == 0 %}
+   <b> <p style="color:#e02926;">موجود نیست</p></b>
+    {% else %}
+    {% if not i.products.discounted %}
+    <!-- regular price -->
+    <p style="color:#e02926;"><b> {{'{0:,}'.format(i.products.price|int)}} تومان</b></p>
+    {% else %}
+    <!-- discounted price -->
+    <p style="color:#e02926;"><b>{{'{0:,}'.format(i.products.discounted|int)}} تومان</b></p>
+    {% endif %}
+    {% endif %}
+    <!-- add to cart icon -->
+    <a style="padding: 3px;" href="{{url_for('cart', id=i.products.id)}}" class="btn btn-primary">
+      <i style="padding: 5px;" class="material-icons">&#xe854;</i></a>
+    <!-- details button -->
+    <a href="{{url_for('product_detail', product_id=i.products.id)}}" class="btn btn-primary" style="padding: 9px;">مشاهده</a>
+  </div>
+</div>
+{% endfor %}
+{% endif %}
+</body>
+{% endblock %}
