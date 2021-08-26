@@ -32,14 +32,6 @@ def login_required_role(role="ANY"):
     return wrapper
 
 
-# pass category to (base.html) template to show in dropdown menu navbar
-@app.context_processor
-def pass_category():
-    # show all categories that has any products in it
-    c = Category.query.filter(Category.id == Products.category_id).all()
-    return dict(category=c)
-
-
 # executes before any tasks
 @app.before_first_request
 def create_admin():
@@ -270,7 +262,7 @@ def delete_cart(id):
     """
     c = Cart.query.filter(
         Cart.cart_id == current_user.id, Cart.product_id == id
-    ).first()
+    ).first_or_404()
     db.session.delete(c)
     db.session.commit()
     return redirect(url_for("show_cart", id=current_user.id))
