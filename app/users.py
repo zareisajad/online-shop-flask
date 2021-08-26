@@ -11,7 +11,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
 from app import app, db
-from app.models import Products, User, Orders
+from app.models import Products, User, Orders, Favorite
 from app.forms import RegisterationForm, LoginForm, EditProfileForm
 
 
@@ -93,7 +93,39 @@ def edit_user_profile():
     elif request.method == 'GET':
         form.name.data = current_user.name
         form.email.data = current_user.email
-    return render_template('edit_user_profile.html', form=form)
+    return render_template('users/edit_user_profile.html', form=form)
+
+
+@app.route("/user/favorite", methods=["GET", "POST"])
+@login_required
+def user_favorites():
+    favorites = current_user.favorite
+    if not favorites:
+        flash('لیست علاقه مندی های شما خالی است.', category='info')
+    return render_template('users/user_favorites.html', favorites=favorites)
+
+
+@app.route("/add/user/favorite/<int:product_id>", methods=["GET", "POST"])
+@login_required
+def add_favorites(product_id):
+    if Favorite.query.filter_by(product_id=product_id, user_id=current_user.id).first():
+        flash('این محصول قبلا اضافه شده', category='danger')
+        return redirect(url_for('user_favorites'))
+    fav = Favorite(product_id=product_id, user_id=current_user.id)
+    db.session.add(fav)
+    db.session.commit()
+    return redirect(url_for('user_favorites'))
+
+
+@app.route("/remove/user/favorite/<int:product_id>", methods=["GET"])
+@login_required
+def remove_favorite(product_id):
+    if request.method == 'GET':
+        product = Favorite.query.filter_by(
+            product_id=product_id, user_id=current_user.id).first_or_404()
+        db.session.delete(product)
+        db.session.commit()
+    return redirect(url_for('user_favorites'))
 
 
 @app.route("/user/profile/orders", methods=["GET", "POST"])
@@ -124,6 +156,6 @@ def user_order_detail(order_id):
     products_id = ast.literal_eval(order.product_id)
     products_number = ast.literal_eval(order.number)
     p = [Products.query.filter(Products.id == i).first() for i in products_id]
-    return render_template('user/user_order_detail.html', order=order,
+    return render_template('users/user_order_detail.html', order=order,
                            number=products_number, product=p, zip=zip,
                            JalaliDateTime=JalaliDateTime, title="لیست سفارشات",)
