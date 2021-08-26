@@ -63,6 +63,11 @@
         <a href="{{url_for('cart', id=product.id)}}"class="btn btn-primary">افزودن به سبد خرید</a>
         {%endif%}
       </div>
+      <a style="vertical-align:middle;text-decoration:none;" href="{{ url_for('add_favorites', product_id=product.id) }}">
+      <i style="font-size:20px;vertical-align:middle;margin-top:-2px;" class="material-icons">&#xe87e;</i>
+        افزودن به علاقه مندی ها
+      </a>
+
       <hr>
       <!-- short description -->
       <p style="margin-bottom:10px;">مشخصات محصول :‌</p>
