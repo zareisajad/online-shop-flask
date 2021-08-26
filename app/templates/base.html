@@ -51,9 +51,9 @@
       </li>
       <!--favorite icon -->
      <li class="nav-item active" >
-      <a  class="nav-link" href="{{ url_for('show_cart')}}">
+      <a  class="nav-link" href="{{ url_for('user_favorites')}}">
         <i class="material-icons">&#xe87d;</i>
-      <label class="cart-number-label"> {{current_user.cart | length }}</label></a>
+      <label class="cart-number-label"> {{current_user.favorite | length }}</label></a>
       </li>
   <li class="nav-item dropdown active">
         <a class="nav-link dropdown" href="#" id="" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
