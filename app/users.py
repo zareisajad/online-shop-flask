@@ -150,9 +150,7 @@ def user_order_detail(order_id):
     find products using our products id: img title and price will use.
     also shown number in template.
     """
-    order = Orders.query.filter_by(id=order_id).first_or_404()
-    if current_user.id != order.user_id:
-        return abort(404)
+    order = Orders.query.filter_by(id=order_id, user_id=current_user.id).first_or_404()
     products_id = ast.literal_eval(order.product_id)
     products_number = ast.literal_eval(order.number)
     p = [Products.query.filter(Products.id == i).first() for i in products_id]
