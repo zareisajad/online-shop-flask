@@ -1,10 +1,10 @@
 """
 all the routes and structure of app defined here.
 """
-
 import os
 import ast
 import datetime
+import bleach
 
 from functools import wraps
 from persiantools.jdatetime import JalaliDateTime
@@ -77,19 +77,23 @@ def add_product():
             c = Category.query.filter_by(name=str(form.category.data)).first()
             uploaded_file = form.photo.data
             filename = secure_filename(uploaded_file.filename)
-            uploaded_file.save(os.path.join(app.config["UPLOAD_PATH"], filename))
+            uploaded_file.save(
+                os.path.join(app.config["UPLOAD_PATH"], filename)
+            )
             url = os.path.join("/images", filename)
+            # clean html editor data in add product form using bleach
+            desc_cleaned_data = bleach.clean(
+                request.form.get('editordata'),
+                tags=app.config.ALLOWED_TAGS,
+                attributes=app.config.ALLOWED_ATTRIBUTES,
+                styles=app.config.ALLOWED_STYLES,
+            )
             p = Products(
-                title=form.title.data,
-                price=form.price.data,
-                discounted=form.discounted.data,
-                sold=0,
-                rate=0,
-                short_desc=form.short_desc.data,
-                desc=form.desc.data,
+                title=form.title.data, price=form.price.data,
+                discounted=form.discounted.data, sold=0, rate=0,
+                short_desc=form.short_desc.data, photo=url,
                 inventory=form.inventory.data,
-                photo=url,
-                category_id=c.id,
+                category_id=c.id, desc=desc_cleaned_data,
             )
             db.session.add(p)
             db.session.commit()
