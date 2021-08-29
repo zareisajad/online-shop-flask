@@ -78,9 +78,7 @@
   </main>
   <div style="text-align: right;width: 1200px;margin: auto;background-color: white;padding:20px;border-radius: 20px;margin-top: 20px;">
     <!-- long description -->
-    <h4 style="margin-bottom:10px;">درباره محصول :‌</h4>
-    <p style="font-size: 14px;color: rgb(97, 97, 97);">{{product.desc}}</p>
-
+    <p style="font-size: 14px;color: rgb(97, 97, 97);">{{ product.desc|safe }}</p>
   </div>
   <div style="text-align: right;width: 1200px;margin: auto;background-color: white;padding:20px;border-radius: 20px;margin-top: 20px;">
     <h3 style="margin-bottom:30px;">نظرات کاربران</h3>
