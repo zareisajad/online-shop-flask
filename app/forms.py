@@ -19,7 +19,6 @@ class AddProductForm(FlaskForm):
         validators=[FileRequired(),FileAllowed(['jpg', 'png', 'jpeg'])])
     title = StringField('عنوان محصول:', validators=[DataRequired()])
     short_desc = TextAreaField('توضیح کوتاه:', validators=[DataRequired()])
-    desc = TextAreaField('توضیحات:', validators=[DataRequired()])
     price = StringField('قیمت:', validators=[DataRequired()])
     discounted = StringField('قیمت تخفیف خورده:')
     inventory = StringField('موجودی:', validators=[DataRequired()])
