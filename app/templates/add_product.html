@@ -1,5 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>without bootstrap</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+  </head>
+<body>
 <div class="container">
   <form style="width: 100%;" method="POST" enctype="multipart/form-data" accept="image/*" multiple>
     {{form.hidden_tag() }}
@@ -12,7 +21,7 @@
       {{ form.short_desc(class_='product-form') }}
     </p>
     <span style="margin-left: 20px;">
-      {{ form.price.label(class_='form-label')  }} 
+      {{ form.price.label(class_='form-label')  }}
       {{ form.price(class_='form-price')}}
     </span>
     <span style="margin-left: 20px;">
@@ -31,8 +40,7 @@
       <br>
     </p>
     <p>
-      {{ form.desc.label(class_='form-label') }}<br>
-      {{ form.desc(class_='product-form') }}
+  <textarea id="summernote" name="editordata"></textarea>
     </p>
     <p>
       {{ form.photo.label(class_='form-label')}} <br>
@@ -45,4 +53,22 @@
         <button style="width: 70%;" type="submit" class="btn btn-primary">ذخیره محصول</button>
       </form>
 </div><br>
+    <script>
+      $('#summernote').summernote({
+        placeholder: 'Hello stand alone ui',
+        tabsize: 2,
+        height: 120,
+        toolbar: [
+          ['style', ['style']],
+          ['font', ['bold', 'underline', 'clear']],
+          ['color', ['color']],
+          ['para', ['ul', 'ol', 'paragraph']],
+          ['table', ['table']],
+          ['insert', ['link', 'picture', 'video']],
+        ]
+      });
+    </script>
+</body>
+
+</html>
 {% endblock %}
